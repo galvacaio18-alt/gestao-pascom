@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -14,39 +15,15 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         .screen { display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .badge-preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            padding: 20px;
-            background: #e5e7eb;
-            border-radius: 16px;
-        }
     </style>
 </head>
 <body class="bg-graybg text-gray-800 font-sans antialiased pb-24">
-
-    <!-- TELA 0: VALIDAÇÃO PÚBLICA DO QR CODE -->
-    <div id="screen-validation" class="screen fixed inset-0 bg-gray-900 z-[200] overflow-y-auto">
-        <div class="min-h-screen flex flex-col items-center justify-center p-4">
-            <div id="public-card-container" class="flex flex-col items-center w-full">
-                <p class="text-white animate-pulse">Carregando validação...</p>
-            </div>
-            <div class="mt-8 text-center">
-                <p class="text-gray-400 text-sm mb-4">Sistema de Gestão - PasCom Paroquial Cristo Ressuscitado</p>
-                <button onclick="window.location.href = window.location.pathname" class="px-6 py-2 bg-brand text-white rounded-full font-bold shadow-lg">Acessar o Sistema</button>
-            </div>
-        </div>
-    </div>
 
     <!-- TELA 1: LOGIN -->
     <div id="screen-login" class="screen active">
@@ -127,18 +104,18 @@
                 <div id="communities-list" class="space-y-3"></div>
             </div>
 
-            <!-- ABA: CRACHÁ -->
+            <!-- ABA: CONSULTA DE AGENTES (Antigo Crachá) -->
             <div id="tab-carteirinha" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Crachá de Identificação</h1><p class="text-sm text-gray-500">Impressão 8x11 cm (Frente e Verso)</p></div>
+                    <div><h1 class="text-2xl font-bold text-gray-900">Consulta Rápida</h1><p class="text-sm text-gray-500">Ficha do Agente</p></div>
                 </div>
                 
                 <select id="select-agent-card" onchange="renderCard()" class="w-full px-4 py-3 border border-gray-300 rounded-xl mb-6 bg-white outline-none focus:ring-2 focus:ring-brand font-medium">
-                    <option value="">Selecione um agente para gerar o crachá...</option>
+                    <option value="">Selecione um agente para consultar...</option>
                 </select>
                 
                 <div id="card-container" class="flex flex-col items-center hidden">
-                    <!-- Os crachás (frente e verso) serão renderizados aqui -->
+                    <!-- A ficha simples será renderizada aqui -->
                 </div>
             </div>
 
@@ -198,7 +175,7 @@
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-start md:justify-around overflow-x-auto no-scrollbar py-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
             <button onclick="switchTab('dashboard')" class="nav-btn text-brand flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] font-bold">Painel</span></button>
             <button onclick="switchTab('membros')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[10px]">Agentes</span></button>
-            <button onclick="switchTab('carteirinha')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="contact" class="w-5 h-5"></i><span class="text-[10px]">Crachá</span></button>
+            <button onclick="switchTab('carteirinha')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="contact" class="w-5 h-5"></i><span class="text-[10px]">Consulta</span></button>
             <button onclick="switchTab('comunidades')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="church" class="w-5 h-5"></i><span class="text-[10px]">Comunid.</span></button>
             <button onclick="switchTab('escalas')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="calendar" class="w-5 h-5"></i><span class="text-[10px]">Escalas</span></button>
             <button onclick="switchTab('financeiro')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[10px]">Caixa</span></button>
@@ -326,100 +303,9 @@
         let globalCommunities = [];
         let globalMembers = [];
 
-        function calculate6MonthsFromNow() {
-            const d = new Date();
-            d.setMonth(d.getMonth() + 6);
-            return d.toISOString().split('T')[0];
-        }
-
         window.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const validateId = urlParams.get('validar');
-            
-            if (validateId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById('screen-validation').classList.add('active');
-                renderPublicView(validateId);
-            } else {
-                checkSession();
-            }
+            checkSession();
         });
-
-        async function renderPublicView(validateId) {
-            const container = document.getElementById('public-card-container');
-            container.innerHTML = '<p class="text-white animate-pulse">Validando...</p>';
-
-            const { data, error } = await supabaseClient.from('members').select('*').eq('id', validateId).single();
-            
-            if (data && !error) {
-                const isInactive = data.status !== 'Ativo';
-                const today = new Date().toISOString().split('T')[0];
-                const isValid = data.valid_until && data.valid_until >= today;
-
-                if (isInactive) {
-                    container.innerHTML = `
-                        <div class="scale-100 md:scale-110">
-                            ${getCardFrontHTML(data)}
-                        </div>
-                        <div class="bg-red-600 text-white p-4 rounded-xl max-w-[320px] mt-4 text-center shadow-lg">
-                            <i data-lucide="alert-octagon" class="w-8 h-8 mx-auto mb-2"></i>
-                            <p class="font-bold">AGENTE INATIVO</p>
-                            <p class="text-xs">Este crachá não é válido para acesso.</p>
-                        </div>
-                    `;
-                } else if (!isValid) {
-                    container.innerHTML = `
-                        <div class="scale-100 md:scale-110">
-                            ${getCardFrontHTML(data)}
-                        </div>
-                        <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl max-w-[320px] mt-4 text-center shadow-lg">
-                            <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-2 text-yellow-600"></i>
-                            <p class="font-bold text-lg">CRACHÁ VENCIDO</p>
-                            <p class="text-xs mb-3">Sua validade expirou. Renove para gerar a nova via.</p>
-                            <button onclick="renewBadge('${data.id}')" class="w-full bg-brand text-white py-2 rounded-lg font-bold shadow hover:bg-brand-dark transition">Renovar por mais 6 meses</button>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = `
-                        <div class="scale-100 md:scale-110">
-                            ${getCardFrontHTML(data)}
-                        </div>
-                        <button onclick="downloadCardPublic('${data.name.replace(/'/g, "\\'")}', ${JSON.stringify(data).replace(/"/g, '&quot;')})" class="mt-4 w-full max-w-[320px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
-                            <i data-lucide="download" class="w-5 h-5"></i> Salvar Crachá (Frente)
-                        </button>
-                    `;
-                }
-                lucide.createIcons();
-            } else {
-                let errorMsg = "Não encontramos nenhum agente com este código.";
-                if (error && error.code === '42501') errorMsg = "A permissão de leitura pública está bloqueada.";
-                
-                container.innerHTML = `
-                    <div class="bg-red-100 text-red-600 p-6 rounded-2xl max-w-sm text-center">
-                        <i data-lucide="alert-triangle" class="w-12 h-12 mx-auto mb-2"></i>
-                        <h3 class="font-bold text-lg">Crachá Inválido</h3>
-                        <p class="text-sm">${errorMsg}</p>
-                    </div>`;
-                lucide.createIcons();
-            }
-        }
-
-        async function renewBadge(id) {
-            const newValidity = calculate6MonthsFromNow();
-            const btn = event.currentTarget;
-            btn.innerHTML = 'Renovando...';
-            btn.disabled = true;
-
-            const { error } = await supabaseClient.from('members').update({ valid_until: newValidity }).eq('id', id);
-            
-            if (!error) {
-                renderPublicView(id);
-            } else {
-                alert("Erro ao renovar. Tente novamente.");
-                btn.innerHTML = 'Renovar por mais 6 meses';
-                btn.disabled = false;
-            }
-        }
 
         function navigate(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -596,7 +482,6 @@
             if (id) {
                 await supabaseClient.from('members').update(payload).eq('id', id);
             } else {
-                payload.valid_until = calculate6MonthsFromNow();
                 await supabaseClient.from('members').insert([payload]);
             }
             
@@ -643,192 +528,63 @@
             });
         }
 
-        // --- CRACHÁ CORRIGIDO ---
+        // --- CONSULTA RÁPIDA (FICHA DO AGENTE) ---
         function populateCardSelector() {
-            document.getElementById('select-agent-card').innerHTML = '<option value="">Selecione um agente para gerar o crachá...</option>' + 
+            document.getElementById('select-agent-card').innerHTML = '<option value="">Selecione um agente para consultar...</option>' + 
                 globalMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
         }
 
-        async function renderCard() {
+        function renderCard() {
             const id = document.getElementById('select-agent-card').value;
             const container = document.getElementById('card-container');
             if (!id) { container.classList.add('hidden'); return; }
             
-            let m = globalMembers.find(x => x.id === id);
-
-            const today = new Date().toISOString().split('T')[0];
-            if (!m.valid_until || m.valid_until < today) {
-                const newVal = calculate6MonthsFromNow();
-                await supabaseClient.from('members').update({ valid_until: newVal }).eq('id', id);
-                m.valid_until = newVal;
-            }
+            const m = globalMembers.find(x => x.id === id);
             
+            const photoHtml = m.photo_url 
+                ? `<img src="${m.photo_url}" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg bg-white">`
+                : `<div class="w-28 h-28 rounded-full bg-brand-light text-brand-dark font-bold flex items-center justify-center text-4xl border-4 border-white shadow-lg">${m.name.charAt(0)}</div>`;
+
+            const birthDate = m.birth_date ? m.birth_date.split('-').reverse().join('/') : 'Não informada';
+
             container.innerHTML = `
-                <div id="badge-to-download" class="badge-preview-container">
-                    ${getCardFrontHTML(m)}
-                    ${getCardBackHTML(m)}
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-sm border border-gray-100">
+                    <div class="bg-gradient-to-r from-brand-dark to-brand h-28 relative"></div>
+                    <div class="px-6 pb-6 relative">
+                        <div class="flex justify-center -mt-14 mb-4">
+                            ${photoHtml}
+                        </div>
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-900">${m.name}</h2>
+                            <p class="text-brand-dark font-medium text-lg">${m.role}</p>
+                            <span class="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full ${m.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                ${m.status}
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <div class="flex items-center gap-3 text-gray-700">
+                                <i data-lucide="church" class="w-4 h-4 text-brand"></i>
+                                <span><strong>Comunidade:</strong> ${m.congregation}</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-700">
+                                <i data-lucide="phone" class="w-4 h-4 text-brand"></i>
+                                <span><strong>Telefone:</strong> ${m.phone || 'Não informado'}</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-700">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-brand"></i>
+                                <span><strong>Endereço:</strong> ${m.address || 'Não informado'}</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-700">
+                                <i data-lucide="cake" class="w-4 h-4 text-brand"></i>
+                                <span><strong>Nascimento:</strong> ${birthDate}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <button onclick="downloadFullBadge('${m.name.replace(/'/g, "\\'")}')" class="mt-6 w-full max-w-[340px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
-                    <i data-lucide="download" class="w-5 h-5"></i> Baixar Crachá (Frente e Verso)
-                </button>
             `;
             container.classList.remove('hidden');
             lucide.createIcons();
-        }
-
-        function getCardFrontHTML(m) {
-            const photoHtml = m.photo_url 
-                ? `<img src="${m.photo_url}" style="width:100%; height:100%; object-fit:cover;" crossorigin="anonymous">`
-                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; background:#333; color: white;">${m.name.charAt(0)}</div>`;
-
-            let roleFontSize = '40px';
-            if (m.role.length > 6) roleFontSize = '32px';
-            if (m.role.length > 9) roleFontSize = '24px';
-            if (m.role.length > 12) roleFontSize = '20px';
-
-            return `
-                <div style="width: 320px; height: 440px; background: #000; position: relative; overflow: hidden; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; flex-shrink: 0;">
-                    
-                    <!-- Faixa Branca Diagonal (Topo Esquerdo) -->
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 45%; background: #fff; clip-path: polygon(0 0, 100% 0, 0 100%); z-index: 1;"></div>
-                    
-                    <!-- Ícone de Câmera -->
-                    <div style="position: absolute; top: 30px; left: 30px; width: 50px; height: 40px; z-index: 2;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:100%;">
-                            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-                            <circle cx="12" cy="13" r="3"/>
-                        </svg>
-                    </div>
-
-                    <!-- Textos (Fundo Preto) -->
-                    <div style="position: absolute; top: 45%; left: 0; width: 100%; text-align: center; z-index: 10;">
-                        <p style="color: #fff; font-size: 14px; font-weight: 300; letter-spacing: 2px; margin: 0 0 5px 0;">EQUIPE</p>
-                        <h1 style="color: #fff; font-size: ${roleFontSize}; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; text-transform: uppercase; padding: 0 10px; word-wrap: break-word;">${m.role}</h1>
-                    </div>
-
-                    <!-- Nome na Pílula Branca -->
-                    <div style="position: absolute; top: 65%; left: 50%; transform: translateX(-50%); background: #fff; padding: 8px 20px; border-radius: 30px; width: 80%; text-align: center; z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing: border-box;">
-                        <span style="color: #000; font-size: 18px; font-weight: 800; text-transform: capitalize; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.name}</span>
-                    </div>
-
-                    <!-- Foto Redonda -->
-                    <div style="position: absolute; top: 76%; left: 50%; transform: translateX(-50%); width: 65px; height: 65px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; z-index: 10; background: #333;">
-                        ${photoHtml}
-                    </div>
-
-                    <!-- Logo Textual PASCOM -->
-                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; text-align: center;">
-                        <p style="color: #fff; font-size: 18px; font-weight: 900; letter-spacing: 3px; margin: 0;">PASCOM</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getCardBackHTML(m) {
-            const baseUrl = window.location.href.split('?')[0];
-            const validateUrl = `${baseUrl}?validar=${m.id}`;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(validateUrl)}&color=000000`;
-
-            let validade = '--/--/----';
-            if (m.valid_until) {
-                const [y, mth, d] = m.valid_until.split('-');
-                validade = `${d}/${mth}/${y}`;
-            }
-
-            return `
-                <div style="width: 320px; height: 440px; background: #111; position: relative; overflow: hidden; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    
-                    <!-- Marca d'água centralizada -->
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; font-weight: 900; color: rgba(255,255,255,0.03); z-index: 1; white-space: nowrap;">PASCOM</div>
-
-                    <!-- Conteúdo Central -->
-                    <div style="position: relative; z-index: 10; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 20px;">
-                        <h2 style="color: #fff; font-size: 16px; font-weight: 800; margin: 0 0 15px 0; letter-spacing: 2px;">VALIDAÇÃO OFICIAL</h2>
-                        
-                        <!-- QR Code -->
-                        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 20px;">
-                            <img src="${qrUrl}" style="width: 130px; height: 130px; display: block;" crossorigin="anonymous">
-                        </div>
-
-                        <!-- Informações do Agente -->
-                        <div style="background: #222; border-radius: 12px; padding: 15px 20px; width: 85%; box-sizing: border-box; border: 1px solid #333;">
-                            <p style="color: #fff; font-size: 14px; font-weight: 700; margin: 0 0 4px 0;">${m.name}</p>
-                            <p style="color: #aaa; font-size: 11px; margin: 0 0 8px 0;">${m.congregation}</p>
-                            <p style="color: #8B5CF6; font-size: 11px; font-weight: 800; margin: 0;">VÁLIDO ATÉ: ${validade}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function downloadFullBadge(name) {
-            const element = document.getElementById('badge-to-download');
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando...';
-            btn.disabled = true;
-
-            html2canvas(element, { 
-                scale: 3, 
-                useCORS: true, 
-                backgroundColor: '#e5e7eb',
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Cracha_${name}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                lucide.createIcons();
-            }).catch(err => {
-                console.error("Erro ao gerar imagem:", err);
-                alert("Erro ao gerar a imagem. Tente novamente.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                lucide.createIcons();
-            });
-        }
-
-        function downloadCardPublic(name, memberData) {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.top = '-9999px';
-            tempDiv.innerHTML = getCardFrontHTML(memberData);
-            document.body.appendChild(tempDiv);
-
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando...';
-            btn.disabled = true;
-
-            html2canvas(tempDiv.firstElementChild, { 
-                scale: 3, 
-                useCORS: true, 
-                backgroundColor: '#000',
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Cracha_${name}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                lucide.createIcons();
-                document.body.removeChild(tempDiv);
-            }).catch(err => {
-                console.error("Erro ao gerar imagem:", err);
-                alert("Erro ao gerar a imagem.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                lucide.createIcons();
-                document.body.removeChild(tempDiv);
-            });
         }
 
         // --- FINANCEIRO ---
