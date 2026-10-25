@@ -21,6 +21,14 @@
         .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Container que segura as duas faces do crachá para o download */
+        .badge-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body class="bg-graybg text-gray-800 font-sans antialiased pb-24">
@@ -120,19 +128,15 @@
             <!-- ABA: CRACHÁ -->
             <div id="tab-carteirinha" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Crachá Digital</h1><p class="text-sm text-gray-500">Identificação Oficial</p></div>
+                    <div><h1 class="text-2xl font-bold text-gray-900">Crachá de Mídia</h1><p class="text-sm text-gray-500">Identificação Oficial (8x11 cm)</p></div>
                 </div>
                 
-                <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-xl mb-4 text-xs text-yellow-800">
-                    <strong>Validade de 6 meses:</strong> O agente pode renovar o próprio crachá escaneando o QR Code, desde que esteja com status "Ativo". Se estiver "Inativo", a renovação é bloqueada.
-                </div>
-
                 <select id="select-agent-card" onchange="renderCard()" class="w-full px-4 py-3 border border-gray-300 rounded-xl mb-6 bg-white outline-none focus:ring-2 focus:ring-brand font-medium">
                     <option value="">Selecione um agente para gerar o crachá...</option>
                 </select>
                 
                 <div id="card-container" class="flex flex-col items-center hidden">
-                    <!-- O crachá será renderizado aqui -->
+                    <!-- Os crachás (frente e verso) serão renderizados aqui -->
                 </div>
             </div>
 
@@ -215,7 +219,7 @@
                     <input type="hidden" id="m-photo-url">
                 </div>
                 <input type="tel" id="m-phone" placeholder="Celular / WhatsApp" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="text" id="m-address" placeholder="Endereço completo (para visitas)" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="m-address" placeholder="Endereço completo" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                 <select id="m-congregation" class="w-full px-4 py-2 border rounded-lg bg-gray-50"></select>
                 <input type="date" id="m-birth" required class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500">
                 <select id="m-status" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
@@ -253,7 +257,7 @@
                     <option value="Entrada">Entrada (Receita)</option>
                     <option value="Saida">Saída (Despesa)</option>
                 </select>
-                <input type="text" id="f-category" required placeholder="Categoria (Ex: Dízimo, Material)" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="f-category" required placeholder="Categoria" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                 <input type="number" step="0.01" id="f-amount" required placeholder="Valor (R$)" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                 <div class="flex gap-2 justify-end mt-4">
                     <button type="button" onclick="closeModal('modal-finance')" class="px-4 py-2 text-gray-500">Cancelar</button>
@@ -270,7 +274,7 @@
                 <input type="hidden" id="v-id">
                 <input type="text" id="v-member" required placeholder="Família / Membro" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                 <input type="text" id="v-leader" required placeholder="Líder Responsável" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <textarea id="v-notes" required placeholder="Resumo da conversa" rows="3" class="w-full px-4 py-2 border rounded-lg bg-gray-50"></textarea>
+                <textarea id="v-notes" required placeholder="Resumo" rows="3" class="w-full px-4 py-2 border rounded-lg bg-gray-50"></textarea>
                 <div class="flex gap-2 justify-end mt-4">
                     <button type="button" onclick="closeModal('modal-visit')" class="px-4 py-2 text-gray-500">Cancelar</button>
                     <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
@@ -284,10 +288,10 @@
             <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-schedule">Nova Escala</h3>
             <form id="form-schedule" class="space-y-3">
                 <input type="hidden" id="s-id">
-                <input type="text" id="s-event" required placeholder="Evento (Ex: Missa Dominical)" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="s-event" required placeholder="Evento" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                 <input type="date" id="s-date" required class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500">
                 <input type="text" id="s-member" required placeholder="Nome do Agente" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="text" id="s-role" required placeholder="Função na Escala" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="s-role" required placeholder="Função" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
                 <div class="flex gap-2 justify-end mt-4">
                     <button type="button" onclick="closeModal('modal-schedule')" class="px-4 py-2 text-gray-500">Cancelar</button>
                     <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
@@ -350,10 +354,13 @@
                 const today = new Date().toISOString().split('T')[0];
                 const isValid = data.valid_until && data.valid_until >= today;
 
+                // Na validação pública, mostra apenas a FRENTE do crachá com o status
                 if (isInactive) {
                     container.innerHTML = `
-                        ${getCardHTML(data)}
-                        <div class="bg-red-600 text-white p-4 rounded-xl max-w-[320px] mt-4 text-center shadow-lg">
+                        <div class="scale-100 md:scale-110">
+                            ${getCardFrontHTML(data)}
+                        </div>
+                        <div class="bg-red-600 text-white p-4 rounded-xl max-w-[340px] mt-4 text-center shadow-lg">
                             <i data-lucide="alert-octagon" class="w-8 h-8 mx-auto mb-2"></i>
                             <p class="font-bold">AGENTE INATIVO</p>
                             <p class="text-xs">Este crachá não é válido para acesso.</p>
@@ -361,19 +368,23 @@
                     `;
                 } else if (!isValid) {
                     container.innerHTML = `
-                        ${getCardHTML(data)}
-                        <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl max-w-[320px] mt-4 text-center shadow-lg">
+                        <div class="scale-100 md:scale-110">
+                            ${getCardFrontHTML(data)}
+                        </div>
+                        <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl max-w-[340px] mt-4 text-center shadow-lg">
                             <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-2 text-yellow-600"></i>
                             <p class="font-bold text-lg">CRACHÁ VENCIDO</p>
-                            <p class="text-xs mb-3">Sua validade expirou. Renove abaixo para gerar a nova via.</p>
+                            <p class="text-xs mb-3">Sua validade expirou. Renove para gerar a nova via.</p>
                             <button onclick="renewBadge('${data.id}')" class="w-full bg-brand text-white py-2 rounded-lg font-bold shadow hover:bg-brand-dark transition">Renovar por mais 6 meses</button>
                         </div>
                     `;
                 } else {
                     container.innerHTML = `
-                        ${getCardHTML(data)}
-                        <button onclick="downloadCard('${data.name.replace(/'/g, "\\'")}')" class="mt-4 w-full max-w-[320px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
-                            <i data-lucide="download" class="w-5 h-5"></i> Salvar Crachá
+                        <div class="scale-100 md:scale-110">
+                            ${getCardFrontHTML(data)}
+                        </div>
+                        <button onclick="downloadCardPublic('${data.name.replace(/'/g, "\\'")}', ${JSON.stringify(data).replace(/"/g, '&quot;')})" class="mt-4 w-full max-w-[340px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
+                            <i data-lucide="download" class="w-5 h-5"></i> Salvar Crachá (Frente)
                         </button>
                     `;
                 }
@@ -566,7 +577,7 @@
                     return;
                 }
 
-                const { data: publicUrlData } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
+                const { data: publicUrlData } = await supabaseClient.storage.from('avatars').getPublicUrl(filePath);
                 photoUrl = publicUrlData.publicUrl;
             }
 
@@ -631,7 +642,7 @@
             });
         }
 
-        // --- CRACHÁ E DOWNLOAD (ADMIN) ---
+        // --- CRACHÁ PERSONALIZADO (MODELO MIDIA) ---
         function populateCardSelector() {
             document.getElementById('select-agent-card').innerHTML = '<option value="">Selecione um agente para gerar o crachá...</option>' + 
                 globalMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
@@ -651,32 +662,80 @@
                 m.valid_until = newVal;
             }
             
+            // Mostra Frente e Verso Lado a Lado
             container.innerHTML = `
-                ${getCardHTML(m)}
+                <div id="badge-to-download" class="badge-preview-container p-4 bg-gray-200 rounded-2xl">
+                    ${getCardFrontHTML(m)}
+                    ${getCardBackHTML(m)}
+                </div>
                 
-                <button onclick="downloadCard('${m.name.replace(/'/g, "\\'")}')" class="mt-6 w-full max-w-[320px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
-                    <i data-lucide="download" class="w-5 h-5"></i> Baixar Crachá (PNG)
+                <button onclick="downloadFullBadge('${m.name.replace(/'/g, "\\'")}')" class="mt-6 w-full max-w-[340px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
+                    <i data-lucide="download" class="w-5 h-5"></i> Baixar Crachá (Frente e Verso)
                 </button>
             `;
             container.classList.remove('hidden');
             lucide.createIcons();
         }
 
-        function getCardHTML(m) {
-            const baseUrl = window.location.href.split('?')[0];
-            const validateUrl = `${baseUrl}?validar=${m.id}`;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(validateUrl)}&color=4C1D95`;
-            
+        // FUNÇÃO QUE GERA O HTML DA FRENTE (IDÊNTICO À IMAGEM)
+        function getCardFrontHTML(m) {
             const photoHtml = m.photo_url 
                 ? `<img src="${m.photo_url}" style="width:100%; height:100%; object-fit:cover;" crossorigin="anonymous">`
-                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; font-weight:bold; background:rgba(255,255,255,0.2);">${m.name.charAt(0)}</div>`;
+                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; font-weight:bold; background:#000; color: white;">${m.name.charAt(0)}</div>`;
 
-            const isInactive = m.status !== 'Ativo';
-            const inactiveOverlay = isInactive ? `
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 50; display: flex; align-items: center; justify-content: center; pointer-events: none;">
-                    <h1 style="color: #EF4444; font-size: 36px; font-weight: 900; transform: rotate(-35deg); border: 4px solid #EF4444; padding: 10px 20px; border-radius: 10px; text-transform: uppercase; letter-spacing: 2px; background: rgba(0,0,0,0.5);">INATIVO</h1>
+            // Para simular o 8x11 cm (proporção 1:1.375), usamos 320px x 440px
+            return `
+                <div style="width: 320px; height: 440px; background: #000; position: relative; overflow: hidden; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; flex-shrink: 0;">
+                    
+                    <!-- Fundo Branco Diagonal -->
+                    <div style="position: absolute; top: -200px; left: -150px; width: 400px; height: 400px; background: #fff; transform: rotate(40deg);"></div>
+                    
+                    <!-- Ícone de Câmera (Topo Esquerdo) -->
+                    <div style="position: absolute; top: 25px; left: 20px; width: 70px; height: 50px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:100%;">
+                            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                            <circle cx="12" cy="13" r="3"/>
+                        </svg>
+                    </div>
+
+                    <!-- Furo do Cordão (Simulação) -->
+                    <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 40px; height: 10px; background: #fff; border-radius: 10px; z-index: 20;"></div>
+
+                    <!-- Textos Principais (Centro) -->
+                    <div style="position: absolute; top: 140px; left: 0; width: 100%; text-align: center; z-index: 10;">
+                        <p style="color: #fff; font-size: 16px; font-weight: 300; letter-spacing: 1px; margin: 0 0 5px 0;">EQUIPE</p>
+                        <h1 style="color: #fff; font-size: 55px; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -2px;">MÍDIA</h1>
+                    </div>
+
+                    <!-- Nome do Agente (Pílula Branca) -->
+                    <div style="position: absolute; top: 230px; left: 50%; transform: translateX(-50%); background: #fff; padding: 8px 30px; border-radius: 30px; width: 75%; text-align: center; z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        <span style="color: #000; font-size: 22px; font-weight: 800; text-transform: capitalize;">${m.name}</span>
+                    </div>
+
+                    <!-- Foto do Agente (Se houver, fica redonda no fundo) -->
+                    ${m.photo_url ? `
+                    <div style="position: absolute; top: 300px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 2px solid #fff; z-index: 10; background: #333;">
+                        ${photoHtml}
+                    </div>` : ''}
+
+                    <!-- Logo Paroquial (Rodapé) -->
+                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; z-index: 10; display: flex; justify-content: center; align-items: center;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:100%;">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            <path d="M2 12h20"/>
+                            <path d="M12 6c-2.2 0-4 2.7-4 6s1.8 6 4 6 4-2.7 4-6-1.8-6-4-6z" fill="#fff" stroke="none"/>
+                        </svg>
+                    </div>
                 </div>
-            ` : '';
+            `;
+        }
+
+        // FUNÇÃO QUE GERA O HTML DO VERSO
+        function getCardBackHTML(m) {
+            const baseUrl = window.location.href.split('?')[0];
+            const validateUrl = `${baseUrl}?validar=${m.id}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(validateUrl)}&color=000000`;
 
             let validade = '--/--/----';
             if (m.valid_until) {
@@ -684,82 +743,55 @@
                 validade = `${d}/${mth}/${y}`;
             }
 
-            // CRACHÁ COM POSICIONAMENTO ABSOLUTO PARA NÃO DESALINHAR NO CELULAR
             return `
-                <div id="card-to-download" style="width: 320px; height: 500px; background: linear-gradient(160deg, #4C1D95 0%, #7C3AED 50%, #A78BFA 100%); border-radius: 20px; position: relative; overflow: hidden; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box;">
+                <div style="width: 320px; height: 440px; background: #111; position: relative; overflow: hidden; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     
-                    ${inactiveOverlay}
-
-                    <!-- Fundo decorativo -->
-                    <div style="position: absolute; top: -30px; right: -30px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;"></div>
-                    <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;"></div>
-
-                    <!-- CABEÇALHO (Topo Absoluto) -->
-                    <div style="position: absolute; top: 20px; left: 0; width: 100%; text-align: center; z-index: 10;">
-                        <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
-                        </div>
-                        <h4 style="margin: 0; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">${m.congregation}</h4>
-                        <p style="margin: 0; font-size: 9px; opacity: 0.9; font-weight: 500;">PasCom Paroquial Cristo Ressuscitado</p>
+                    <!-- Marca d'água fundo -->
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-around; opacity: 0.1; pointer-events: none; overflow: hidden;">
+                        <h1 style="color: #fff; font-size: 90px; font-weight: 900; margin: 0; transform: rotate(-90deg); letter-spacing: 5px; white-space: nowrap;">MÍDIA</h1>
+                        <h1 style="color: #fff; font-size: 90px; font-weight: 900; margin: 0; transform: rotate(-90deg); letter-spacing: 5px; white-space: nowrap;">MÍDIA</h1>
+                        <h1 style="color: #fff; font-size: 90px; font-weight: 900; margin: 0; transform: rotate(-90deg); letter-spacing: 5px; white-space: nowrap;">MÍDIA</h1>
                     </div>
 
-                    <!-- CORPO (Foto e Info, Centro Absoluto) -->
-                    <div style="position: absolute; top: 130px; left: 0; width: 100%; text-align: center; z-index: 10; display: flex; flex-direction: column; align-items: center;">
-                        <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 3px solid rgba(255,255,255,0.6); box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-bottom: 10px; background: #7C3AED;">
-                            ${photoHtml}
-                        </div>
+                    <!-- Conteúdo Central -->
+                    <div style="position: relative; z-index: 10; text-align: center; width: 100%;">
+                        <p style="color: #fff; font-size: 12px; font-weight: 400; letter-spacing: 2px; margin: 0;">SIGA NOSSO</p>
+                        <h2 style="color: #fff; font-size: 22px; font-weight: 800; margin: 0 0 15px 0;">INSTAGRAM</h2>
                         
-                        <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800; line-height: 1.1;">${m.name}</h3>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E9D5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                            <p style="margin: 0; font-size: 13px; color: #E9D5FF; font-weight: 600;">${m.role}</p>
+                        <!-- QR Code no lugar do quadrado branco -->
+                        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+                            <img src="${qrUrl}" style="width: 140px; height: 140px; display: block;" crossorigin="anonymous">
                         </div>
-                        
-                        <div>
-                            <span style="font-size: 10px; font-weight: 800; padding: 4px 12px; background: ${m.status === 'Ativo' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}; color: ${m.status === 'Ativo' ? '#86EFAC' : '#FCA5A5'}; border-radius: 20px; border: 1px solid ${m.status === 'Ativo' ? '#22C55E' : '#EF4444'}; text-transform: uppercase;">${m.status}</span>
-                        </div>
-                    </div>
 
-                    <!-- RODAPÉ (QR Code e Validade, Base Absoluta) -->
-                    <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; z-index: 10;">
-                        <div style="background: white; border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: 75px; box-sizing: border-box;">
-                            <img src="${qrUrl}" style="width: 55px; height: 55px; border-radius: 6px;" crossorigin="anonymous">
-                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-                                <div>
-                                    <p style="margin: 0 0 2px 0; font-size: 9px; font-weight: 800; color: #7C3AED; text-transform: uppercase;">Validação Oficial</p>
-                                    <p style="margin: 0; font-size: 8px; color: #4B5563; line-height: 1.2; font-weight: 500;">Válido como identificação pastoral.</p>
-                                </div>
-                                <div style="background: #F3E8FF; padding: 2px 6px; border-radius: 4px; display: inline-block; align-self: flex-start;">
-                                    <p style="margin: 0; font-size: 8px; font-weight: 800; color: #7C3AED;">VÁLIDO: ${validade}</p>
-                                </div>
-                            </div>
+                        <!-- Validade e Insta -->
+                        <div style="background: #fff; border-radius: 10px; padding: 5px 15px; margin-top: 15px; display: inline-block;">
+                            <p style="color: #000; font-size: 10px; font-weight: 800; margin: 0;">VÁLIDO: ${validade}</p>
                         </div>
+                        
+                        <p style="color: #aaa; font-size: 10px; margin-top: 20px;">@pascomcristoressuscitado</p>
                     </div>
                 </div>
             `;
         }
 
-        function downloadCard(name) {
-            const element = document.getElementById('card-to-download');
+        // FUNÇÃO DE DOWNLOAD (ADMIN) - GERA AS DUAS FACES
+        function downloadFullBadge(name) {
+            const element = document.getElementById('badge-to-download');
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
             
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando...';
             btn.disabled = true;
 
-            // Forçando o tamanho exato na renderização para não desalinhar no celular
+            // Forçando a renderização exata do container
             html2canvas(element, { 
                 scale: 3, 
                 useCORS: true, 
-                backgroundColor: null, 
-                logging: false,
-                width: 320,
-                height: 500,
-                windowWidth: 320,
-                windowHeight: 500
+                backgroundColor: '#e5e7eb', // Fundo cinza claro para a imagem inteira
+                logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `Crachá_${name}.png`;
+                link.download = `Crachas_Midia_${name}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
@@ -768,10 +800,51 @@
                 lucide.createIcons();
             }).catch(err => {
                 console.error("Erro ao gerar imagem:", err);
-                alert("Erro ao gerar a imagem do crachá.");
+                alert("Erro ao gerar a imagem. Tente novamente.");
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 lucide.createIcons();
+            });
+        }
+
+        // FUNÇÃO DE DOWNLOAD (PÚBLICO) - GERA APENAS A FRENTE
+        function downloadCardPublic(name, memberData) {
+            const container = document.getElementById('public-card-container');
+            // Cria um container temporário isolado para o download
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.top = '-9999px';
+            tempDiv.innerHTML = getCardFrontHTML(memberData);
+            document.body.appendChild(tempDiv);
+
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando...';
+            btn.disabled = true;
+
+            html2canvas(tempDiv.firstElementChild, { 
+                scale: 3, 
+                useCORS: true, 
+                backgroundColor: '#000',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Cracha_${name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                lucide.createIcons();
+                document.body.removeChild(tempDiv); // Limpa
+            }).catch(err => {
+                console.error("Erro ao gerar imagem:", err);
+                alert("Erro ao gerar a imagem.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                lucide.createIcons();
+                document.body.removeChild(tempDiv);
             });
         }
 
