@@ -28,7 +28,7 @@
     <!-- TELA 0: VALIDAÇÃO PÚBLICA DO QR CODE -->
     <div id="screen-validation" class="screen fixed inset-0 bg-gray-900 z-[200] overflow-y-auto">
         <div class="min-h-screen flex flex-col items-center justify-center p-4">
-            <div id="public-card-container" class="flex flex-col items-center">
+            <div id="public-card-container" class="flex flex-col items-center w-full">
                 <p class="text-white animate-pulse">Carregando validação...</p>
             </div>
             <div class="mt-8 text-center">
@@ -122,6 +122,11 @@
                 <div class="flex justify-between items-center mb-6 mt-2">
                     <div><h1 class="text-2xl font-bold text-gray-900">Crachá Digital</h1><p class="text-sm text-gray-500">Identificação Oficial</p></div>
                 </div>
+                
+                <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-xl mb-4 text-xs text-yellow-800">
+                    <strong>Validade de 6 meses:</strong> O agente pode renovar o próprio crachá escaneando o QR Code, desde que esteja com status "Ativo". Se estiver "Inativo", a renovação é bloqueada.
+                </div>
+
                 <select id="select-agent-card" onchange="renderCard()" class="w-full px-4 py-3 border border-gray-300 rounded-xl mb-6 bg-white outline-none focus:ring-2 focus:ring-brand font-medium">
                     <option value="">Selecione um agente para gerar o crachá...</option>
                 </select>
@@ -315,7 +320,14 @@
         let globalCommunities = [];
         let globalMembers = [];
 
-        // LÓGICA DE VALIDAÇÃO PÚBLICA (ROTA ?validar=)
+        // Função para calcular 6 meses a frente
+        function calculate6MonthsFromNow() {
+            const d = new Date();
+            d.setMonth(d.getMonth() + 6);
+            return d.toISOString().split('T')[0]; // Retorna YYYY-MM-DD
+        }
+
+        // LÓGICA DE VALIDAÇÃO PÚBLICA E RENOVAÇÃO
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const validateId = urlParams.get('validar');
@@ -323,28 +335,82 @@
             if (validateId) {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('screen-validation').classList.add('active');
-                
-                const { data, error } = await supabaseClient.from('members').select('*').eq('id', validateId).single();
-                
-                if (data && !error) {
-                    document.getElementById('public-card-container').innerHTML = getCardHTML(data);
-                } else {
-                    let errorMsg = "Não encontramos nenhum agente com este código.";
-                    if (error && error.code === '42501') {
-                        errorMsg = "A permissão de leitura pública está bloqueada no banco de dados. Verifique as políticas no Supabase.";
-                    }
-                    document.getElementById('public-card-container').innerHTML = `
-                        <div class="bg-red-100 text-red-600 p-6 rounded-2xl max-w-sm text-center">
-                            <i data-lucide="alert-triangle" class="w-12 h-12 mx-auto mb-2"></i>
-                            <h3 class="font-bold text-lg">Crachá Inválido</h3>
-                            <p class="text-sm">${errorMsg}</p>
-                        </div>`;
-                    lucide.createIcons();
-                }
+                renderPublicView(validateId);
             } else {
                 checkSession();
             }
         });
+
+        async function renderPublicView(validateId) {
+            const container = document.getElementById('public-card-container');
+            container.innerHTML = '<p class="text-white animate-pulse">Validando...</p>';
+
+            const { data, error } = await supabaseClient.from('members').select('*').eq('id', validateId).single();
+            
+            if (data && !error) {
+                const isInactive = data.status !== 'Ativo';
+                const today = new Date().toISOString().split('T')[0];
+                const isValid = data.valid_until && data.valid_until >= today;
+
+                if (isInactive) {
+                    container.innerHTML = `
+                        ${getCardHTML(data)}
+                        <div class="bg-red-600 text-white p-4 rounded-xl max-w-[320px] mt-4 text-center shadow-lg">
+                            <i data-lucide="alert-octagon" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">AGENTE INATIVO</p>
+                            <p class="text-xs">Este crachá não é válido para acesso.</p>
+                        </div>
+                    `;
+                } else if (!isValid) {
+                    container.innerHTML = `
+                        ${getCardHTML(data)}
+                        <div class="bg-yellow-100 text-yellow-800 p-4 rounded-xl max-w-[320px] mt-4 text-center shadow-lg">
+                            <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-2 text-yellow-600"></i>
+                            <p class="font-bold text-lg">CRACHÁ VENCIDO</p>
+                            <p class="text-xs mb-3">Sua validade expirou. Renove abaixo para gerar a nova via.</p>
+                            <button onclick="renewBadge('${data.id}')" class="w-full bg-brand text-white py-2 rounded-lg font-bold shadow hover:bg-brand-dark transition">Renovar por mais 6 meses</button>
+                        </div>
+                    `;
+                } else {
+                    // Está ativo e válido
+                    container.innerHTML = `
+                        ${getCardHTML(data)}
+                        <button onclick="downloadCard('${data.name.replace(/'/g, "\\'")}')" class="mt-4 w-full max-w-[320px] bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition flex justify-center items-center gap-2">
+                            <i data-lucide="download" class="w-5 h-5"></i> Salvar Crachá
+                        </button>
+                    `;
+                }
+                lucide.createIcons();
+            } else {
+                let errorMsg = "Não encontramos nenhum agente com este código.";
+                if (error && error.code === '42501') errorMsg = "A permissão de leitura pública está bloqueada.";
+                
+                container.innerHTML = `
+                    <div class="bg-red-100 text-red-600 p-6 rounded-2xl max-w-sm text-center">
+                        <i data-lucide="alert-triangle" class="w-12 h-12 mx-auto mb-2"></i>
+                        <h3 class="font-bold text-lg">Crachá Inválido</h3>
+                        <p class="text-sm">${errorMsg}</p>
+                    </div>`;
+                lucide.createIcons();
+            }
+        }
+
+        async function renewBadge(id) {
+            const newValidity = calculate6MonthsFromNow();
+            const btn = event.currentTarget;
+            btn.innerHTML = 'Renovando...';
+            btn.disabled = true;
+
+            const { error } = await supabaseClient.from('members').update({ valid_until: newValidity }).eq('id', id);
+            
+            if (!error) {
+                renderPublicView(id); // Recarrega a tela com a nova validade
+            } else {
+                alert("Erro ao renovar. Tente novamente.");
+                btn.innerHTML = 'Renovar por mais 6 meses';
+                btn.disabled = false;
+            }
+        }
 
         function navigate(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -518,8 +584,12 @@
                 status: document.getElementById('m-status').value
             };
 
-            if (id) await supabaseClient.from('members').update(payload).eq('id', id);
-            else await supabaseClient.from('members').insert([payload]);
+            if (id) {
+                await supabaseClient.from('members').update(payload).eq('id', id);
+            } else {
+                payload.valid_until = calculate6MonthsFromNow(); // Define validade ao criar novo
+                await supabaseClient.from('members').insert([payload]);
+            }
             
             btn.innerHTML = 'Salvar'; btn.disabled = false;
             closeModal('modal-member'); loadAllData();
@@ -564,18 +634,26 @@
             });
         }
 
-        // --- CRACHÁ E DOWNLOAD ---
+        // --- CRACHÁ E DOWNLOAD (ADMIN) ---
         function populateCardSelector() {
             document.getElementById('select-agent-card').innerHTML = '<option value="">Selecione um agente para gerar o crachá...</option>' + 
                 globalMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
         }
 
-        function renderCard() {
+        async function renderCard() {
             const id = document.getElementById('select-agent-card').value;
             const container = document.getElementById('card-container');
             if (!id) { container.classList.add('hidden'); return; }
             
-            const m = globalMembers.find(x => x.id === id);
+            let m = globalMembers.find(x => x.id === id);
+
+            // Se o crachá não tem validade ou está vencido, renova automaticamente ao gerar na tela do admin
+            const today = new Date().toISOString().split('T')[0];
+            if (!m.valid_until || m.valid_until < today) {
+                const newVal = calculate6MonthsFromNow();
+                await supabaseClient.from('members').update({ valid_until: newVal }).eq('id', id);
+                m.valid_until = newVal; // Atualiza o objeto local
+            }
             
             container.innerHTML = `
                 ${getCardHTML(m)}
@@ -597,9 +675,25 @@
                 ? `<img src="${m.photo_url}" style="width:100%; height:100%; object-fit:cover;" crossorigin="anonymous">`
                 : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; font-weight:bold; background:rgba(255,255,255,0.2);">${m.name.charAt(0)}</div>`;
 
+            const isInactive = m.status !== 'Ativo';
+            const inactiveOverlay = isInactive ? `
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 50; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+                    <h1 style="color: #EF4444; font-size: 36px; font-weight: 900; transform: rotate(-35deg); border: 4px solid #EF4444; padding: 10px 20px; border-radius: 10px; text-transform: uppercase; letter-spacing: 2px; background: rgba(0,0,0,0.5);">INATIVO</h1>
+                </div>
+            ` : '';
+
+            // Formata a data de validade para o padrão brasileiro
+            let validade = '--/--/----';
+            if (m.valid_until) {
+                const [y, mth, d] = m.valid_until.split('-');
+                validade = `${d}/${mth}/${y}`;
+            }
+
             return `
                 <div id="card-to-download" style="width: 320px; height: 500px; background: linear-gradient(160deg, #4C1D95 0%, #7C3AED 50%, #A78BFA 100%); border-radius: 20px; position: relative; overflow: hidden; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
                     
+                    ${inactiveOverlay}
+
                     <div style="position: absolute; top: -30px; right: -30px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;"></div>
                     <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%;"></div>
 
@@ -628,9 +722,14 @@
                     <div style="padding: 0 20px 20px 20px; position: relative; z-index: 10;">
                         <div style="background: white; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                             <img src="${qrUrl}" style="width: 70px; height: 70px; border-radius: 6px;" crossorigin="anonymous">
-                            <div style="flex: 1; text-align: left;">
-                                <p style="margin: 0 0 2px 0; font-size: 9px; font-weight: 800; color: #7C3AED; text-transform: uppercase;">Validação Oficial</p>
-                                <p style="margin: 0; font-size: 8px; color: #4B5563; line-height: 1.2; font-weight: 500;">Válido como identificação pastoral da coordenação paroquial de Cristo Ressuscitado.</p>
+                            <div style="flex: 1; text-align: left; display: flex; flex-direction: column; justify-content: space-between; height: 70px;">
+                                <div>
+                                    <p style="margin: 0 0 2px 0; font-size: 9px; font-weight: 800; color: #7C3AED; text-transform: uppercase;">Validação Oficial</p>
+                                    <p style="margin: 0; font-size: 8px; color: #4B5563; line-height: 1.2; font-weight: 500;">Válido como identificação pastoral.</p>
+                                </div>
+                                <div style="background: #F3E8FF; padding: 2px 6px; border-radius: 4px; display: inline-block; align-self: flex-start;">
+                                    <p style="margin: 0; font-size: 9px; font-weight: 800; color: #7C3AED;">VÁLIDO ATÉ: ${validade}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -643,7 +742,7 @@
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
             
-            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando imagem...';
+            btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando...';
             btn.disabled = true;
 
             html2canvas(element, { scale: 3, useCORS: true, backgroundColor: null, logging: false }).then(canvas => {
@@ -787,7 +886,6 @@
             closeModal('modal-notice'); loadNotices();
         });
 
-        // FUNÇÃO GENÉRICA DE EXCLUSÃO
         async function deleteItem(table, id) {
             if(confirm("Tem certeza que deseja excluir este item?")) {
                 await supabaseClient.from(table).delete().eq('id', id);
