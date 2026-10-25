@@ -22,7 +22,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Container que segura as duas faces do crachá para o download */
         .badge-preview-container {
             display: flex;
             flex-wrap: wrap;
@@ -644,7 +643,7 @@
             });
         }
 
-        // --- CRACHÁ PERSONALIZADO (MODELO MIDIA CORRIGIDO) ---
+        // --- CRACHÁ CORRIGIDO ---
         function populateCardSelector() {
             document.getElementById('select-agent-card').innerHTML = '<option value="">Selecione um agente para gerar o crachá...</option>' + 
                 globalMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
@@ -664,7 +663,6 @@
                 m.valid_until = newVal;
             }
             
-            // Mostra Frente e Verso Lado a Lado
             container.innerHTML = `
                 <div id="badge-to-download" class="badge-preview-container">
                     ${getCardFrontHTML(m)}
@@ -679,66 +677,54 @@
             lucide.createIcons();
         }
 
-        // FUNÇÃO QUE GERA O HTML DA FRENTE (100% DINÂMICO)
         function getCardFrontHTML(m) {
             const photoHtml = m.photo_url 
                 ? `<img src="${m.photo_url}" style="width:100%; height:100%; object-fit:cover;" crossorigin="anonymous">`
-                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:bold; background:#000; color: white;">${m.name.charAt(0)}</div>`;
+                : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; background:#333; color: white;">${m.name.charAt(0)}</div>`;
 
-            // Ajusta o tamanho da fonte da função para não estourar o layout
-            let roleFontSize = '48px';
-            if (m.role.length > 6) roleFontSize = '38px';
-            if (m.role.length > 9) roleFontSize = '28px';
-            if (m.role.length > 12) roleFontSize = '22px';
+            let roleFontSize = '40px';
+            if (m.role.length > 6) roleFontSize = '32px';
+            if (m.role.length > 9) roleFontSize = '24px';
+            if (m.role.length > 12) roleFontSize = '20px';
 
             return `
                 <div style="width: 320px; height: 440px; background: #000; position: relative; overflow: hidden; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; flex-shrink: 0;">
                     
-                    <!-- Fundo Branco Diagonal (Corte Perfeito sem Deformar) -->
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 65%; background: #fff; clip-path: polygon(0 0, 100% 0, 0 100%);"></div>
+                    <!-- Faixa Branca Diagonal (Topo Esquerdo) -->
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 45%; background: #fff; clip-path: polygon(0 0, 100% 0, 0 100%); z-index: 1;"></div>
                     
-                    <!-- Ícone de Câmera no Espaço Branco -->
-                    <div style="position: absolute; top: 25px; left: 20px; width: 60px; height: 45px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:100%;">
+                    <!-- Ícone de Câmera -->
+                    <div style="position: absolute; top: 30px; left: 30px; width: 50px; height: 40px; z-index: 2;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:100%;">
                             <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
                             <circle cx="12" cy="13" r="3"/>
                         </svg>
                     </div>
 
-                    <!-- Furo do Cordão -->
-                    <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 40px; height: 10px; background: #fff; border-radius: 10px; z-index: 20;"></div>
-
-                    <!-- Textos Principais (Função Dinâmica) -->
-                    <div style="position: absolute; top: 150px; left: 10px; width: 300px; text-align: center; z-index: 10;">
-                        <p style="color: #fff; font-size: 12px; font-weight: 400; letter-spacing: 1px; margin: 0 0 5px 0;">EQUIPE</p>
-                        <h1 style="color: #fff; font-size: ${roleFontSize}; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; text-transform: uppercase; word-wrap: break-word;">${m.role}</h1>
+                    <!-- Textos (Fundo Preto) -->
+                    <div style="position: absolute; top: 45%; left: 0; width: 100%; text-align: center; z-index: 10;">
+                        <p style="color: #fff; font-size: 14px; font-weight: 300; letter-spacing: 2px; margin: 0 0 5px 0;">EQUIPE</p>
+                        <h1 style="color: #fff; font-size: ${roleFontSize}; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; text-transform: uppercase; padding: 0 10px; word-wrap: break-word;">${m.role}</h1>
                     </div>
 
-                    <!-- Nome do Agente (Pílula Branca) -->
-                    <div style="position: absolute; top: 240px; left: 50%; transform: translateX(-50%); background: #fff; padding: 6px 20px; border-radius: 30px; width: 85%; text-align: center; z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing: border-box;">
+                    <!-- Nome na Pílula Branca -->
+                    <div style="position: absolute; top: 65%; left: 50%; transform: translateX(-50%); background: #fff; padding: 8px 20px; border-radius: 30px; width: 80%; text-align: center; z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing: border-box;">
                         <span style="color: #000; font-size: 18px; font-weight: 800; text-transform: capitalize; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.name}</span>
                     </div>
 
-                    <!-- Foto do Agente (Se houver) -->
-                    ${m.photo_url ? `
-                    <div style="position: absolute; top: 300px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 2px solid #fff; z-index: 10; background: #333;">
+                    <!-- Foto Redonda -->
+                    <div style="position: absolute; top: 76%; left: 50%; transform: translateX(-50%); width: 65px; height: 65px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; z-index: 10; background: #333;">
                         ${photoHtml}
-                    </div>` : ''}
+                    </div>
 
-                    <!-- Logo Paroquial (Rodapé) -->
-                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; z-index: 10; display: flex; justify-content: center; align-items: center;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:100%;">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                            <path d="M2 12h20"/>
-                            <path d="M12 6c-2.2 0-4 2.7-4 6s1.8 6 4 6 4-2.7 4-6-1.8-6-4-6z" fill="#fff" stroke="none"/>
-                        </svg>
+                    <!-- Logo Textual PASCOM -->
+                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; text-align: center;">
+                        <p style="color: #fff; font-size: 18px; font-weight: 900; letter-spacing: 3px; margin: 0;">PASCOM</p>
                     </div>
                 </div>
             `;
         }
 
-        // FUNÇÃO QUE GERA O HTML DO VERSO (Informações do Agente)
         function getCardBackHTML(m) {
             const baseUrl = window.location.href.split('?')[0];
             const validateUrl = `${baseUrl}?validar=${m.id}`;
@@ -753,34 +739,29 @@
             return `
                 <div style="width: 320px; height: 440px; background: #111; position: relative; overflow: hidden; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     
-                    <!-- Marca d'água fundo com o nome da Função -->
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-around; opacity: 0.05; pointer-events: none; overflow: hidden;">
-                        <h1 style="color: #fff; font-size: 80px; font-weight: 900; margin: 0; transform: rotate(-90deg); letter-spacing: 5px; white-space: nowrap; text-transform: uppercase;">${m.role}</h1>
-                        <h1 style="color: #fff; font-size: 80px; font-weight: 900; margin: 0; transform: rotate(-90deg); letter-spacing: 5px; white-space: nowrap; text-transform: uppercase;">${m.role}</h1>
-                        <h1 style="color: #fff; font-size: 80px; font-weight: 900; margin: 0; transform: rotate(-90deg); letter-spacing: 5px; white-space: nowrap; text-transform: uppercase;">${m.role}</h1>
-                    </div>
+                    <!-- Marca d'água centralizada -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; font-weight: 900; color: rgba(255,255,255,0.03); z-index: 1; white-space: nowrap;">PASCOM</div>
 
                     <!-- Conteúdo Central -->
-                    <div style="position: relative; z-index: 10; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
-                        <h2 style="color: #fff; font-size: 18px; font-weight: 800; margin: 0 0 15px 0; letter-spacing: 1px;">VALIDAÇÃO OFICIAL</h2>
+                    <div style="position: relative; z-index: 10; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 20px;">
+                        <h2 style="color: #fff; font-size: 16px; font-weight: 800; margin: 0 0 15px 0; letter-spacing: 2px;">VALIDAÇÃO OFICIAL</h2>
                         
                         <!-- QR Code -->
-                        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 15px;">
+                        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 20px;">
                             <img src="${qrUrl}" style="width: 130px; height: 130px; display: block;" crossorigin="anonymous">
                         </div>
 
-                        <!-- Informações -->
-                        <div style="background: #222; border-radius: 10px; padding: 10px 20px; width: 80%; box-sizing: border-box; border: 1px solid #333;">
-                            <p style="color: #fff; font-size: 12px; font-weight: 700; margin: 0 0 4px 0;">${m.name}</p>
-                            <p style="color: #aaa; font-size: 10px; margin: 0 0 4px 0;">${m.congregation}</p>
-                            <p style="color: #8B5CF6; font-size: 10px; font-weight: 800; margin: 0;">VÁLIDO ATÉ: ${validade}</p>
+                        <!-- Informações do Agente -->
+                        <div style="background: #222; border-radius: 12px; padding: 15px 20px; width: 85%; box-sizing: border-box; border: 1px solid #333;">
+                            <p style="color: #fff; font-size: 14px; font-weight: 700; margin: 0 0 4px 0;">${m.name}</p>
+                            <p style="color: #aaa; font-size: 11px; margin: 0 0 8px 0;">${m.congregation}</p>
+                            <p style="color: #8B5CF6; font-size: 11px; font-weight: 800; margin: 0;">VÁLIDO ATÉ: ${validade}</p>
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // FUNÇÃO DE DOWNLOAD (ADMIN) - GERA AS DUAS FACES
         function downloadFullBadge(name) {
             const element = document.getElementById('badge-to-download');
             const btn = event.currentTarget;
@@ -789,11 +770,10 @@
             btn.innerHTML = '<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Gerando...';
             btn.disabled = true;
 
-            // Forçando a renderização exata do container
             html2canvas(element, { 
                 scale: 3, 
                 useCORS: true, 
-                backgroundColor: '#e5e7eb', // Fundo cinza claro para a imagem inteira
+                backgroundColor: '#e5e7eb',
                 logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
@@ -813,7 +793,6 @@
             });
         }
 
-        // FUNÇÃO DE DOWNLOAD (PÚBLICO) - GERA APENAS A FRENTE
         function downloadCardPublic(name, memberData) {
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'absolute';
@@ -841,7 +820,7 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 lucide.createIcons();
-                document.body.removeChild(tempDiv); // Limpa
+                document.body.removeChild(tempDiv);
             }).catch(err => {
                 console.error("Erro ao gerar imagem:", err);
                 alert("Erro ao gerar a imagem.");
