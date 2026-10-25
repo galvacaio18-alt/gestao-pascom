@@ -1,62 +1,154 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PasCom Paroquial Cristo Ressuscitado - Gestão Completa</title>
+    <title>PasCom Paroquial Cristo Ressuscitado - Tech</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { brand: { light: '#F3E8FF', DEFAULT: '#8B5CF6', dark: '#7C3AED' }, graybg: '#F9FAFB' } } }
+            theme: { 
+                extend: { 
+                    colors: { 
+                        brand: { light: '#F3E8FF', DEFAULT: '#8B5CF6', dark: '#7C3AED' },
+                        techbg: '#0F172A',
+                        techcard: '#1E293B',
+                        neon: '#A855F7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        tech: ['Orbitron', 'sans-serif']
+                    }
+                } 
+            }
         }
     </script>
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
+        body {
+            background-color: #0F172A;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        /* FUNDO TECNOLÓGICO */
+        .tech-grid {
+            position: fixed;
+            top: 0; left: 0; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(20deg);
+            animation: moveGrid 10s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(20deg) translateY(40px); }
+        }
+
+        /* LUZES DE FUNDO */
+        .glow-orb {
+            position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.4;
+            animation: floatOrb 10s infinite alternate; pointer-events: none;
+        }
+        .orb-purple { width: 400px; height: 400px; background: #8B5CF6; top: -100px; left: -100px; }
+        .orb-blue { width: 300px; height: 300px; background: #3B82F6; bottom: -50px; right: -50px; animation-delay: -5s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 50px); }
+        }
+
+        /* ÍCONES FLUTUANTES */
+        .float-icon {
+            position: fixed; color: rgba(139, 92, 246, 0.15); z-index: -1;
+            animation: floatIcon 6s ease-in-out infinite; pointer-events: none;
+        }
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        /* EFEITO DE VIDRO */
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-hover:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
         .screen { display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tab-content { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .text-neon { text-shadow: 0 0 10px rgba(139, 92, 246, 0.7); }
+        .border-neon { border-color: rgba(139, 92, 246, 0.5); box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.2); }
     </style>
 </head>
-<body class="bg-graybg text-gray-800 font-sans antialiased pb-24">
+<body class="font-sans antialiased pb-24">
+
+    <!-- FUNDO -->
+    <div class="tech-grid"></div>
+    <div class="glow-orb orb-purple"></div>
+    <div class="glow-orb orb-blue"></div>
+    <i data-lucide="camera" class="float-icon w-16 h-16" style="top: 10%; left: 10%;"></i>
+    <i data-lucide="mic" class="float-icon w-20 h-20" style="top: 60%; left: 5%; animation-delay: 1s;"></i>
+    <i data-lucide="wifi" class="float-icon w-12 h-12" style="top: 30%; right: 15%; animation-delay: 2s;"></i>
+    <i data-lucide="radio" class="float-icon w-24 h-24" style="bottom: 10%; right: 5%; animation-delay: 3s;"></i>
 
     <!-- TELA 1: LOGIN -->
     <div id="screen-login" class="screen active">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+        <div class="min-h-screen flex items-center justify-center p-4 relative z-10">
+            <div class="glass p-8 rounded-2xl w-full max-w-md border-neon">
                 <div class="text-center mb-8">
-                    <div class="inline-flex bg-brand text-white p-3 rounded-xl mb-4 shadow-lg"><i data-lucide="megaphone"></i></div>
-                    <h2 class="text-2xl font-bold text-gray-900 text-center">PasCom Paroquial Cristo Ressuscitado</h2>
-                    <p class="text-gray-500 text-sm mt-1">Acesso restrito à coordenação</p>
+                    <div class="inline-flex bg-brand text-white p-4 rounded-2xl mb-4 shadow-[0_0_20px_rgba(139,92,246,0.5)]"><i data-lucide="satellite-dish" class="w-8 h-8"></i></div>
+                    <h2 class="text-2xl font-tech font-bold text-white text-center tracking-wider">PASCOM <span class="text-neon">CRISTO</span></h2>
+                    <p class="text-gray-400 text-sm mt-1">Acesso restrito à coordenação</p>
                 </div>
                 <form id="login-form" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-                        <input type="email" id="email" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand outline-none bg-gray-50" placeholder="seu@email.com">
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">E-mail</label>
+                        <input type="email" id="email" required class="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none bg-gray-800/50 text-white transition-all" placeholder="seu@email.com">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                        <input type="password" id="password" required minlength="6" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand outline-none bg-gray-50" placeholder="Mínimo 6 caracteres">
+                        <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Senha</label>
+                        <input type="password" id="password" required minlength="6" class="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none bg-gray-800/50 text-white transition-all" placeholder="••••••••">
                     </div>
-                    <button type="submit" id="btn-submit" class="w-full bg-brand text-white py-3 rounded-xl font-bold shadow-lg hover:bg-brand-dark transition mt-4 flex justify-center items-center">Entrar no Sistema</button>
+                    <button type="submit" id="btn-submit" class="w-full bg-gradient-to-r from-brand to-blue-600 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] transition-all mt-4 flex justify-center items-center">Acessar Sistema</button>
                 </form>
                 <p id="auth-msg" class="text-sm text-center mt-4 hidden p-2 rounded-lg"></p>
             </div>
         </div>
     </div>
 
-    <!-- TELA 2: APLICAÇÃO PRINCIPAL -->
-    <div id="screen-app" class="screen">
-        <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-40 shadow-sm">
-            <div class="flex items-center gap-2 font-bold text-brand-dark text-sm md:text-base">
-                <i data-lucide="megaphone" class="text-brand"></i> PasCom Paroquial Cristo Ressuscitado
+    <!-- TELA 2: APLICAÇÃO -->
+    <div id="screen-app" class="screen relative z-10">
+        <header class="glass border-b border-gray-700 px-4 py-3 flex justify-between items-center sticky top-0 z-40">
+            <div class="flex items-center gap-2 font-tech font-bold text-white text-sm md:text-base tracking-wider">
+                <i data-lucide="satellite-dish" class="text-neon"></i> PASCOM TECH
             </div>
-            <button onclick="logout()" class="text-gray-500 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition"><i data-lucide="log-out"></i></button>
+            <button onclick="logout()" class="text-gray-400 hover:text-red-400 p-2 rounded-lg hover:bg-red-900/30 transition"><i data-lucide="power"></i></button>
         </header>
 
         <main class="p-4 max-w-2xl mx-auto">
@@ -64,24 +156,35 @@
             <!-- ABA: PAINEL -->
             <div id="tab-dashboard" class="tab-content">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Painel Paroquial</h1><p class="text-sm text-gray-500">Resumo da comunicação</p></div>
+                    <div><h1 class="text-2xl font-bold text-white">Painel Estatístico</h1><p class="text-sm text-gray-400">Monitoramento em tempo real</p></div>
                 </div>
+
+                <!-- Card Especial Carlo Acutis -->
+                <div class="glass rounded-2xl p-5 mb-6 border-l-4 border-l-neon relative overflow-hidden">
+                    <div class="absolute right-0 top-0 opacity-10"><i data-lucide="globe" class="w-32 h-32 text-white"></i></div>
+                    <p class="text-sm text-gray-300 italic mb-2">"A Eucaristia é a minha autoestrada para o Céu."</p>
+                    <p class="text-xs font-bold text-neon uppercase tracking-wider">- Carlo Acutis (Padroeiro da Internet)</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-gray-400 border-t border-gray-700 pt-2">
+                        <i data-lucide="crown" class="w-4 h-4 text-yellow-500"></i> Sob a proteção de Nossa Senhora Aparecida
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <p class="text-3xl font-bold text-brand-dark" id="stat-total-members">-</p>
-                        <p class="text-sm text-gray-500 mt-1">Agentes Ativos</p>
+                    <div class="glass glass-hover p-4 rounded-2xl">
+                        <p class="text-4xl font-tech font-bold text-neon" id="stat-total-members">-</p>
+                        <p class="text-xs text-gray-400 mt-2 uppercase tracking-wider font-bold">Agentes Ativos</p>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <p class="text-3xl font-bold text-brand-dark" id="stat-communities">-</p>
-                        <p class="text-sm text-gray-500 mt-1">Comunidades</p>
+                    <div class="glass glass-hover p-4 rounded-2xl">
+                        <p class="text-4xl font-tech font-bold text-blue-400" id="stat-communities">-</p>
+                        <p class="text-xs text-gray-400 mt-2 uppercase tracking-wider font-bold">Comunidades</p>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-                    <h3 class="font-bold text-gray-900 mb-4">Faixa Etária da Equipe</h3>
+                <div class="glass p-5 rounded-2xl mb-6">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="activity" class="text-neon w-5 h-5"></i> Faixa Etária (Data Analytics)</h3>
                     <div class="relative h-48 w-full"><canvas id="ageChart"></canvas></div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-                    <h3 class="font-bold text-gray-900 mb-4">Aniversariantes do Mês</h3>
+                <div class="glass p-5 rounded-2xl mb-6">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="cake" class="text-pink-400 w-5 h-5"></i> Aniversariantes do Mês</h3>
                     <div id="birthdays-list" class="space-y-3"></div>
                 </div>
             </div>
@@ -89,8 +192,8 @@
             <!-- ABA: AGENTES -->
             <div id="tab-membros" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Agentes</h1><p class="text-sm text-gray-500">Equipe da PasCom</p></div>
-                    <button onclick="openMemberModal()" class="bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div><h1 class="text-2xl font-bold text-white">Agentes</h1><p class="text-sm text-gray-400">Base de dados da equipe</p></div>
+                    <button onclick="openMemberModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="user-plus" class="w-5 h-5"></i></button>
                 </div>
                 <div id="members-list" class="space-y-3"></div>
             </div>
@@ -98,45 +201,41 @@
             <!-- ABA: COMUNIDADES -->
             <div id="tab-comunidades" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Comunidades</h1><p class="text-sm text-gray-500">Locais de atuação</p></div>
-                    <button onclick="openCommunityModal()" class="bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div><h1 class="text-2xl font-bold text-white">Comunidades</h1><p class="text-sm text-gray-400">Nós de atuação</p></div>
+                    <button onclick="openCommunityModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="map-pin" class="w-5 h-5"></i></button>
                 </div>
                 <div id="communities-list" class="space-y-3"></div>
             </div>
 
-            <!-- ABA: CONSULTA DE AGENTES (Antigo Crachá) -->
+            <!-- ABA: CONSULTA RÁPIDA -->
             <div id="tab-carteirinha" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Consulta Rápida</h1><p class="text-sm text-gray-500">Ficha do Agente</p></div>
+                    <div><h1 class="text-2xl font-bold text-white">Consulta Rápida</h1><p class="text-sm text-gray-400">Ficha do Agente</p></div>
                 </div>
-                
-                <select id="select-agent-card" onchange="renderCard()" class="w-full px-4 py-3 border border-gray-300 rounded-xl mb-6 bg-white outline-none focus:ring-2 focus:ring-brand font-medium">
+                <select id="select-agent-card" onchange="renderCard()" class="w-full px-4 py-3 border border-gray-600 rounded-xl mb-6 bg-gray-800/80 text-white outline-none focus:ring-2 focus:ring-brand font-medium">
                     <option value="">Selecione um agente para consultar...</option>
                 </select>
-                
-                <div id="card-container" class="flex flex-col items-center hidden">
-                    <!-- A ficha simples será renderizada aqui -->
-                </div>
+                <div id="card-container" class="flex flex-col items-center hidden"></div>
             </div>
 
             <!-- ABA: FINANCEIRO -->
             <div id="tab-financeiro" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Financeiro</h1><p class="text-sm text-gray-500">Caixa da Pastoral</p></div>
-                    <button onclick="openFinanceModal()" class="bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div><h1 class="text-2xl font-bold text-white">Financeiro</h1><p class="text-sm text-gray-400">Fluxo de caixa</p></div>
+                    <button onclick="openFinanceModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-4 text-center">
-                    <p class="text-sm text-gray-500 font-medium mb-1">Saldo Atual</p>
-                    <h2 class="text-4xl font-extrabold text-brand-dark" id="finance-balance">R$ -</h2>
+                <div class="glass p-6 rounded-2xl mb-4 text-center">
+                    <p class="text-xs text-gray-400 font-medium mb-1 uppercase tracking-wider">Saldo Atual</p>
+                    <h2 class="text-4xl font-tech font-extrabold text-green-400 text-neon" id="finance-balance">R$ -</h2>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-green-100 flex items-center gap-3">
-                        <div class="bg-green-100 p-2 rounded-lg text-green-600"><i data-lucide="arrow-up"></i></div>
-                        <div><p class="text-xs text-gray-500">Entradas</p><p class="font-bold text-gray-900" id="finance-income">R$ -</p></div>
+                    <div class="glass p-4 rounded-2xl border-l-4 border-l-green-500">
+                        <div class="flex items-center gap-2 text-green-400 mb-1"><i data-lucide="arrow-up-right" class="w-4 h-4"></i><p class="text-xs font-bold">Entradas</p></div>
+                        <p class="font-bold text-white" id="finance-income">R$ -</p>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-red-100 flex items-center gap-3">
-                        <div class="bg-red-100 p-2 rounded-lg text-red-600"><i data-lucide="arrow-down"></i></div>
-                        <div><p class="text-xs text-gray-500">Saídas</p><p class="font-bold text-gray-900" id="finance-expense">R$ -</p></div>
+                    <div class="glass p-4 rounded-2xl border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-2 text-red-400 mb-1"><i data-lucide="arrow-down-right" class="w-4 h-4"></i><p class="text-xs font-bold">Saídas</p></div>
+                        <p class="font-bold text-white" id="finance-expense">R$ -</p>
                     </div>
                 </div>
                 <div id="finance-list" class="space-y-2"></div>
@@ -145,8 +244,8 @@
             <!-- ABA: VISITAS -->
             <div id="tab-visitas" class="tab-content hidden">
                  <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Visitas</h1><p class="text-sm text-gray-500">Acompanhamento</p></div>
-                    <button onclick="openVisitModal()" class="bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div><h1 class="text-2xl font-bold text-white">Visitas</h1><p class="text-sm text-gray-400">Logs de acompanhamento</p></div>
+                    <button onclick="openVisitModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
                 </div>
                  <div id="visits-list" class="space-y-3"></div>
             </div>
@@ -154,8 +253,8 @@
             <!-- ABA: ESCALAS -->
             <div id="tab-escalas" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Escalas</h1><p class="text-sm text-gray-500">Missas e Eventos</p></div>
-                    <button onclick="openScheduleModal()" class="bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div><h1 class="text-2xl font-bold text-white">Escalas</h1><p class="text-sm text-gray-400">Cronograma de eventos</p></div>
+                    <button onclick="openScheduleModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
                 </div>
                 <div id="schedules-list" class="space-y-3"></div>
             </div>
@@ -163,8 +262,8 @@
             <!-- ABA: AVISOS -->
             <div id="tab-avisos" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-gray-900">Mural de Avisos</h1><p class="text-sm text-gray-500">Recados</p></div>
-                    <button onclick="openNoticeModal()" class="bg-brand text-white p-3 rounded-full shadow-lg hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                    <div><h1 class="text-2xl font-bold text-white">Broadcast</h1><p class="text-sm text-gray-400">Mural de avisos</p></div>
+                    <button onclick="openNoticeModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
                 </div>
                 <div id="notices-list" class="space-y-3"></div>
             </div>
@@ -172,123 +271,123 @@
         </main>
 
         <!-- MENU INFERIOR -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-start md:justify-around overflow-x-auto no-scrollbar py-2 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <button onclick="switchTab('dashboard')" class="nav-btn text-brand flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] font-bold">Painel</span></button>
-            <button onclick="switchTab('membros')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[10px]">Agentes</span></button>
-            <button onclick="switchTab('carteirinha')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="contact" class="w-5 h-5"></i><span class="text-[10px]">Consulta</span></button>
-            <button onclick="switchTab('comunidades')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="church" class="w-5 h-5"></i><span class="text-[10px]">Comunid.</span></button>
-            <button onclick="switchTab('escalas')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="calendar" class="w-5 h-5"></i><span class="text-[10px]">Escalas</span></button>
-            <button onclick="switchTab('financeiro')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[10px]">Caixa</span></button>
-            <button onclick="switchTab('visitas')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="heart-handshake" class="w-5 h-5"></i><span class="text-[10px]">Visitas</span></button>
-            <button onclick="switchTab('avisos')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px]"><i data-lucide="bell" class="w-5 h-5"></i><span class="text-[10px]">Avisos</span></button>
+        <nav class="fixed bottom-0 left-0 right-0 glass border-t border-gray-700 flex justify-start md:justify-around overflow-x-auto no-scrollbar py-2 z-50">
+            <button onclick="switchTab('dashboard')" class="nav-btn text-neon flex flex-col items-center gap-1 min-w-[70px] transition-all"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] font-bold">Painel</span></button>
+            <button onclick="switchTab('membros')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[10px]">Agentes</span></button>
+            <button onclick="switchTab('carteirinha')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="scan-face" class="w-5 h-5"></i><span class="text-[10px]">Consulta</span></button>
+            <button onclick="switchTab('comunidades')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="church" class="w-5 h-5"></i><span class="text-[10px]">Comunid.</span></button>
+            <button onclick="switchTab('escalas')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="calendar" class="w-5 h-5"></i><span class="text-[10px]">Escalas</span></button>
+            <button onclick="switchTab('financeiro')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[10px]">Caixa</span></button>
+            <button onclick="switchTab('visitas')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="heart-handshake" class="w-5 h-5"></i><span class="text-[10px]">Visitas</span></button>
+            <button onclick="switchTab('avisos')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="radio-tower" class="w-5 h-5"></i><span class="text-[10px]">Avisos</span></button>
         </nav>
     </div>
 
     <!-- ================= MODAIS ================= -->
-    <div id="modal-member" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-member">Novo Agente</h3>
+    <div id="modal-member" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-white mb-4" id="title-member">Novo Agente</h3>
             <form id="form-member" class="space-y-3">
                 <input type="hidden" id="m-id">
-                <input type="text" id="m-name" required placeholder="Nome completo" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="text" id="m-role" required placeholder="Função (Ex: Fotografia, Redes)" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                    <label class="block text-xs font-bold text-gray-600 mb-2">Foto do Agente (Upload)</label>
-                    <input type="file" id="m-photo-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-light file:text-brand-dark hover:file:bg-brand/20 cursor-pointer">
+                <input type="text" id="m-name" required placeholder="Nome completo" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="text" id="m-role" required placeholder="Função (Ex: Fotografia, Redes)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <div class="bg-gray-800/80 border border-gray-600 rounded-lg p-3">
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Foto do Agente (Upload)</label>
+                    <input type="file" id="m-photo-file" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand file:text-white hover:file:bg-brand-dark cursor-pointer">
                     <input type="hidden" id="m-photo-url">
                 </div>
-                <input type="tel" id="m-phone" placeholder="Celular / WhatsApp" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="text" id="m-address" placeholder="Endereço completo" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <select id="m-congregation" class="w-full px-4 py-2 border rounded-lg bg-gray-50"></select>
-                <input type="date" id="m-birth" required class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500">
-                <select id="m-status" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="tel" id="m-phone" placeholder="Celular / WhatsApp" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="text" id="m-address" placeholder="Endereço completo" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <select id="m-congregation" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></select>
+                <input type="date" id="m-birth" required class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-400 focus:ring-2 focus:ring-brand outline-none">
+                <select id="m-status" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                     <option value="Ativo">Ativo na Pastoral</option>
                     <option value="Inativo">Inativo / Afastado</option>
                 </select>
                 <div class="flex gap-2 justify-end mt-4">
-                    <button type="button" onclick="closeModal('modal-member')" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button type="submit" id="btn-save-member" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
+                    <button type="button" onclick="closeModal('modal-member')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
+                    <button type="submit" id="btn-save-member" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
     
-    <div id="modal-community" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-community">Nova Comunidade</h3>
+    <div id="modal-community" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4" id="title-community">Nova Comunidade</h3>
             <form id="form-community" class="space-y-3">
                 <input type="hidden" id="c-id">
-                <input type="text" id="c-name" required placeholder="Nome da Comunidade" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="c-name" required placeholder="Nome da Comunidade" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                 <div class="flex gap-2 justify-end mt-4">
-                    <button type="button" onclick="closeModal('modal-community')" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
+                    <button type="button" onclick="closeModal('modal-community')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-finance" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-finance">Nova Transação</h3>
+    <div id="modal-finance" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4" id="title-finance">Nova Transação</h3>
             <form id="form-finance" class="space-y-3">
                 <input type="hidden" id="f-id">
-                <select id="f-type" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <select id="f-type" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                     <option value="Entrada">Entrada (Receita)</option>
                     <option value="Saida">Saída (Despesa)</option>
                 </select>
-                <input type="text" id="f-category" required placeholder="Categoria" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="number" step="0.01" id="f-amount" required placeholder="Valor (R$)" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="f-category" required placeholder="Categoria" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="number" step="0.01" id="f-amount" required placeholder="Valor (R$)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                 <div class="flex gap-2 justify-end mt-4">
-                    <button type="button" onclick="closeModal('modal-finance')" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
+                    <button type="button" onclick="closeModal('modal-finance')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-visit" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-visit">Registrar Visita</h3>
+    <div id="modal-visit" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4" id="title-visit">Registrar Visita</h3>
             <form id="form-visit" class="space-y-3">
                 <input type="hidden" id="v-id">
-                <input type="text" id="v-member" required placeholder="Família / Membro" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="text" id="v-leader" required placeholder="Líder Responsável" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <textarea id="v-notes" required placeholder="Resumo" rows="3" class="w-full px-4 py-2 border rounded-lg bg-gray-50"></textarea>
+                <input type="text" id="v-member" required placeholder="Família / Membro" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="text" id="v-leader" required placeholder="Líder Responsável" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <textarea id="v-notes" required placeholder="Resumo" rows="3" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></textarea>
                 <div class="flex gap-2 justify-end mt-4">
-                    <button type="button" onclick="closeModal('modal-visit')" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
+                    <button type="button" onclick="closeModal('modal-visit')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-schedule" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-schedule">Nova Escala</h3>
+    <div id="modal-schedule" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4" id="title-schedule">Nova Escala</h3>
             <form id="form-schedule" class="space-y-3">
                 <input type="hidden" id="s-id">
-                <input type="text" id="s-event" required placeholder="Evento" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="date" id="s-date" required class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500">
-                <input type="text" id="s-member" required placeholder="Nome do Agente" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <input type="text" id="s-role" required placeholder="Função" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                <input type="text" id="s-event" required placeholder="Evento" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="date" id="s-date" required class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-400 focus:ring-2 focus:ring-brand outline-none">
+                <input type="text" id="s-member" required placeholder="Nome do Agente" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="text" id="s-role" required placeholder="Função" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                 <div class="flex gap-2 justify-end mt-4">
-                    <button type="button" onclick="closeModal('modal-schedule')" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
+                    <button type="button" onclick="closeModal('modal-schedule')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-notice" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="title-notice">Novo Aviso</h3>
+    <div id="modal-notice" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4" id="title-notice">Novo Aviso</h3>
             <form id="form-notice" class="space-y-3">
                 <input type="hidden" id="n-id">
-                <input type="text" id="n-title" required placeholder="Título do Aviso" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
-                <textarea id="n-content" required placeholder="Escreva o recado..." rows="4" class="w-full px-4 py-2 border rounded-lg bg-gray-50"></textarea>
+                <input type="text" id="n-title" required placeholder="Título do Aviso" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <textarea id="n-content" required placeholder="Escreva o recado..." rows="4" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></textarea>
                 <div class="flex gap-2 justify-end mt-4">
-                    <button type="button" onclick="closeModal('modal-notice')" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold">Salvar</button>
+                    <button type="button" onclick="closeModal('modal-notice')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
@@ -316,9 +415,15 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('text-brand'); b.classList.add('text-gray-400'); });
-            document.querySelector(`.nav-btn[onclick="switchTab('${tabId}')"]`).classList.remove('text-gray-400');
-            document.querySelector(`.nav-btn[onclick="switchTab('${tabId}')"]`).classList.add('text-brand');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => { 
+                b.classList.remove('text-neon'); 
+                b.classList.add('text-gray-400'); 
+            });
+            const activeBtn = document.querySelector(`.nav-btn[onclick="switchTab('${tabId}')"]`);
+            activeBtn.classList.remove('text-gray-400');
+            activeBtn.classList.add('text-neon');
+
             if(tabId === 'carteirinha') populateCardSelector();
         }
 
@@ -334,17 +439,17 @@
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
             const msg = document.getElementById('auth-msg');
-            btn.innerHTML = 'Verificando...'; btn.disabled = true; msg.className = 'hidden';
+            btn.innerHTML = 'Autenticando...'; btn.disabled = true; msg.className = 'hidden';
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error && error.message.includes('Invalid login credentials')) {
                 let { error: signUpError } = await supabaseClient.auth.signUp({ email, password });
-                if (signUpError) { msg.textContent = "Erro: " + signUpError.message; msg.className = "text-sm text-center mt-4 text-red-600 bg-red-50 block p-2 rounded-lg"; }
+                if (signUpError) { msg.textContent = "Erro: " + signUpError.message; msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg"; }
                 else { navigate('app'); return; }
-            } else if (error) { msg.textContent = "Erro: " + error.message; msg.className = "text-sm text-center mt-4 text-red-600 bg-red-50 block p-2 rounded-lg"; } 
+            } else if (error) { msg.textContent = "Erro: " + error.message; msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg"; } 
             else { navigate('app'); }
-            btn.innerHTML = 'Entrar no Sistema'; btn.disabled = false;
+            btn.innerHTML = 'Acessar Sistema'; btn.disabled = false;
         });
 
         async function logout() { await supabaseClient.auth.signOut(); navigate('login'); }
@@ -361,11 +466,11 @@
             globalCommunities = data || [];
             document.getElementById('m-congregation').innerHTML = globalCommunities.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
             document.getElementById('communities-list').innerHTML = globalCommunities.map(c => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
-                    <span class="font-bold text-gray-900">${c.name}</span>
+                <div class="glass p-4 rounded-xl flex justify-between items-center border border-gray-700">
+                    <span class="font-bold text-white">${c.name}</span>
                     <div class="flex gap-2">
-                        <button onclick="editCommunity('${c.id}', '${c.name}')" class="text-blue-500 hover:text-blue-700 p-1"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                        <button onclick="deleteItem('communities', '${c.id}')" class="text-red-500 hover:text-red-700 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        <button onclick="editCommunity('${c.id}', '${c.name}')" class="text-blue-400 hover:text-blue-300 p-1"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                        <button onclick="deleteItem('communities', '${c.id}')" class="text-red-400 hover:text-red-300 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                 </div>`).join('');
             lucide.createIcons();
@@ -386,25 +491,25 @@
             globalMembers = data || [];
             document.getElementById('members-list').innerHTML = globalMembers.map(m => {
                 const avatar = m.photo_url 
-                    ? `<img src="${m.photo_url}" class="w-10 h-10 rounded-full object-cover shadow-sm">` 
+                    ? `<img src="${m.photo_url}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-600">` 
                     : `<div class="bg-brand-light text-brand-dark font-bold w-10 h-10 rounded-full flex items-center justify-center">${m.name.charAt(0)}</div>`;
 
                 return `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                <div class="glass p-4 rounded-xl flex justify-between items-center border border-gray-700">
                     <div class="flex items-center gap-3">
                         ${avatar}
                         <div>
-                            <p class="font-bold text-gray-900">${m.name}</p>
-                            <p class="text-xs text-gray-500">${m.role} • ${m.congregation}</p>
+                            <p class="font-bold text-white">${m.name}</p>
+                            <p class="text-xs text-gray-400">${m.role} • ${m.congregation}</p>
                         </div>
                     </div>
                     <div class="flex flex-col items-end gap-2">
-                        <button onclick="toggleStatus('${m.id}', '${m.status}')" class="text-[10px] font-bold px-2 py-1 rounded-md transition ${m.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                        <button onclick="toggleStatus('${m.id}', '${m.status}')" class="text-[10px] font-bold px-2 py-1 rounded-md transition ${m.status === 'Ativo' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'}">
                             ${m.status}
                         </button>
                         <div class="flex gap-1">
-                            <button onclick="editMember('${m.id}')" class="text-blue-400 p-1"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                            <button onclick="deleteItem('members', '${m.id}')" class="text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="editMember('${m.id}')" class="text-blue-400 p-1 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                            <button onclick="deleteItem('members', '${m.id}')" class="text-red-400 p-1 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>
                 </div>`;
@@ -479,11 +584,8 @@
                 status: document.getElementById('m-status').value
             };
 
-            if (id) {
-                await supabaseClient.from('members').update(payload).eq('id', id);
-            } else {
-                await supabaseClient.from('members').insert([payload]);
-            }
+            if (id) await supabaseClient.from('members').update(payload).eq('id', id);
+            else await supabaseClient.from('members').insert([payload]);
             
             btn.innerHTML = 'Salvar'; btn.disabled = false;
             closeModal('modal-member'); loadAllData();
@@ -497,9 +599,9 @@
             
             const birthdays = globalMembers.slice(0, 3);
             document.getElementById('birthdays-list').innerHTML = birthdays.map(b => `
-                <div class="flex justify-between items-center py-2 border-b border-gray-50">
-                    <div><p class="font-medium text-gray-900">${b.name}</p><p class="text-xs text-gray-500">${b.congregation}</p></div>
-                    <span class="text-sm font-bold text-brand-dark bg-brand-light px-2 py-1 rounded-md">${b.birth_date ? b.birth_date.split('-').reverse().slice(0,2).join('/') : '--/--'}</span>
+                <div class="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">
+                    <div><p class="font-medium text-white">${b.name}</p><p class="text-xs text-gray-400">${b.congregation}</p></div>
+                    <span class="text-sm font-bold text-neon bg-brand-light px-2 py-1 rounded-md bg-opacity-20">${b.birth_date ? b.birth_date.split('-').reverse().slice(0,2).join('/') : '--/--'}</span>
                 </div>`).join('');
             renderChart();
         }
@@ -523,12 +625,31 @@
             if (window.myChart instanceof Chart) window.myChart.destroy();
             window.myChart = new Chart(canvas.getContext('2d'), {
                 type: 'bar',
-                data: { labels: Object.keys(bins), datasets: [{ label: 'Agentes', data: Object.values(bins), backgroundColor: '#8B5CF6', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+                data: { 
+                    labels: Object.keys(bins), 
+                    datasets: [{ 
+                        label: 'Agentes', 
+                        data: Object.values(bins), 
+                        backgroundColor: '#A855F7',
+                        borderRadius: 6,
+                        borderColor: '#C084FC',
+                        borderWidth: 1
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    animation: { duration: 2000, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { display: false, beginAtZero: true }, 
+                        x: { grid: { display: false }, ticks: { color: '#9CA3AF' } } 
+                    } 
+                }
             });
         }
 
-        // --- CONSULTA RÁPIDA (FICHA DO AGENTE) ---
+        // --- CONSULTA RÁPIDA ---
         function populateCardSelector() {
             document.getElementById('select-agent-card').innerHTML = '<option value="">Selecione um agente para consultar...</option>' + 
                 globalMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
@@ -542,41 +663,41 @@
             const m = globalMembers.find(x => x.id === id);
             
             const photoHtml = m.photo_url 
-                ? `<img src="${m.photo_url}" class="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg bg-white">`
-                : `<div class="w-28 h-28 rounded-full bg-brand-light text-brand-dark font-bold flex items-center justify-center text-4xl border-4 border-white shadow-lg">${m.name.charAt(0)}</div>`;
+                ? `<img src="${m.photo_url}" class="w-28 h-28 rounded-full object-cover border-4 border-slate-600 shadow-lg bg-slate-800">`
+                : `<div class="w-28 h-28 rounded-full bg-slate-700 text-slate-300 font-bold flex items-center justify-center text-4xl border-4 border-slate-600 shadow-lg">${m.name.charAt(0)}</div>`;
 
             const birthDate = m.birth_date ? m.birth_date.split('-').reverse().join('/') : 'Não informada';
 
             container.innerHTML = `
-                <div class="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-sm border border-gray-100">
-                    <div class="bg-gradient-to-r from-brand-dark to-brand h-28 relative"></div>
+                <div class="glass rounded-3xl shadow-xl overflow-hidden w-full max-w-sm border border-gray-700">
+                    <div class="bg-gradient-to-r from-brand-dark to-blue-600 h-28 relative"></div>
                     <div class="px-6 pb-6 relative">
                         <div class="flex justify-center -mt-14 mb-4">
                             ${photoHtml}
                         </div>
                         <div class="text-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-900">${m.name}</h2>
-                            <p class="text-brand-dark font-medium text-lg">${m.role}</p>
-                            <span class="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full ${m.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                            <h2 class="text-2xl font-bold text-white">${m.name}</h2>
+                            <p class="text-neon font-medium text-lg">${m.role}</p>
+                            <span class="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full ${m.status === 'Ativo' ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'}">
                                 ${m.status}
                             </span>
                         </div>
                         
-                        <div class="space-y-3 text-sm bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <div class="flex items-center gap-3 text-gray-700">
-                                <i data-lucide="church" class="w-4 h-4 text-brand"></i>
+                        <div class="space-y-3 text-sm bg-slate-800/50 p-4 rounded-2xl border border-gray-700">
+                            <div class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="church" class="w-4 h-4 text-neon"></i>
                                 <span><strong>Comunidade:</strong> ${m.congregation}</span>
                             </div>
-                            <div class="flex items-center gap-3 text-gray-700">
-                                <i data-lucide="phone" class="w-4 h-4 text-brand"></i>
+                            <div class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="phone" class="w-4 h-4 text-neon"></i>
                                 <span><strong>Telefone:</strong> ${m.phone || 'Não informado'}</span>
                             </div>
-                            <div class="flex items-center gap-3 text-gray-700">
-                                <i data-lucide="map-pin" class="w-4 h-4 text-brand"></i>
+                            <div class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-neon"></i>
                                 <span><strong>Endereço:</strong> ${m.address || 'Não informado'}</span>
                             </div>
-                            <div class="flex items-center gap-3 text-gray-700">
-                                <i data-lucide="cake" class="w-4 h-4 text-brand"></i>
+                            <div class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="cake" class="w-4 h-4 text-neon"></i>
                                 <span><strong>Nascimento:</strong> ${birthDate}</span>
                             </div>
                         </div>
@@ -594,11 +715,11 @@
             if (finances) {
                 document.getElementById('finance-list').innerHTML = finances.map(f => {
                     if (f.type === 'Entrada') income += parseFloat(f.amount); else expense += parseFloat(f.amount);
-                    return `<div class="bg-white p-3 rounded-lg shadow-sm border flex justify-between items-center mb-2">
-                        <div><p class="font-bold text-sm">${f.category}</p><p class="text-xs ${f.type === 'Entrada' ? 'text-green-600' : 'text-red-600'}">${f.type === 'Entrada' ? '+' : '-'} R$ ${parseFloat(f.amount).toFixed(2)}</p></div>
+                    return `<div class="glass p-3 rounded-lg flex justify-between items-center mb-2 border border-gray-700">
+                        <div><p class="font-bold text-sm text-white">${f.category}</p><p class="text-xs ${f.type === 'Entrada' ? 'text-green-400' : 'text-red-400'}">${f.type === 'Entrada' ? '+' : '-'} R$ ${parseFloat(f.amount).toFixed(2)}</p></div>
                         <div class="flex gap-1">
-                            <button onclick="editFinance('${f.id}', '${f.type}', '${f.category}', ${f.amount})" class="text-blue-400 p-1"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                            <button onclick="deleteItem('finances', '${f.id}')" class="text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="editFinance('${f.id}', '${f.type}', '${f.category}', ${f.amount})" class="text-blue-400 p-1 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                            <button onclick="deleteItem('finances', '${f.id}')" class="text-red-400 p-1 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>`;
                 }).join('');
@@ -624,17 +745,17 @@
             const { data: visits } = await supabaseClient.from('visits').select('*').order('visit_date', { ascending: false });
             if (visits) {
                 document.getElementById('visits-list').innerHTML = visits.map(v => `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="glass p-4 rounded-xl border border-gray-700">
                         <div class="flex justify-between items-start mb-2">
-                            <p class="font-bold text-gray-900">${v.member_name}</p>
+                            <p class="font-bold text-white">${v.member_name}</p>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-500">${v.visit_date.split('-').reverse().join('/')}</span>
-                                <button onclick="editVisit('${v.id}', '${v.member_name}', '${v.leader_name}', '${v.notes}')" class="text-blue-400"><i data-lucide="edit" class="w-3 h-3"></i></button>
-                                <button onclick="deleteItem('visits', '${v.id}')" class="text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                                <span class="text-xs text-gray-400">${v.visit_date.split('-').reverse().join('/')}</span>
+                                <button onclick="editVisit('${v.id}', '${v.member_name}', '${v.leader_name}', '${v.notes}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-3 h-3"></i></button>
+                                <button onclick="deleteItem('visits', '${v.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-2">"${v.notes}"</p>
-                        <p class="text-xs text-brand-dark font-medium"><i data-lucide="user" class="inline w-3 h-3 mr-1"></i> ${v.leader_name}</p>
+                        <p class="text-sm text-gray-300 mb-2">"${v.notes}"</p>
+                        <p class="text-xs text-neon font-medium"><i data-lucide="user" class="inline w-3 h-3 mr-1"></i> ${v.leader_name}</p>
                     </div>`).join('');
                 lucide.createIcons();
             }
@@ -655,16 +776,16 @@
             const { data: schedules } = await supabaseClient.from('schedules').select('*').order('event_date', { ascending: true });
             if (schedules) {
                 document.getElementById('schedules-list').innerHTML = schedules.map(s => `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="glass p-4 rounded-xl border border-gray-700">
                         <div class="flex justify-between items-center mb-1">
-                            <p class="font-bold text-brand-dark text-sm">${s.event_name}</p>
+                            <p class="font-bold text-neon text-sm">${s.event_name}</p>
                             <div class="flex gap-2">
-                                <button onclick="editSchedule('${s.id}', '${s.event_name}', '${s.event_date}', '${s.member_name}', '${s.role}')" class="text-blue-400"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                                <button onclick="deleteItem('schedules', '${s.id}')" class="text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editSchedule('${s.id}', '${s.event_name}', '${s.event_date}', '${s.member_name}', '${s.role}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                <button onclick="deleteItem('schedules', '${s.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500 mb-2">${s.event_date.split('-').reverse().join('/')}</p>
-                        <div class="flex gap-2 text-sm"><span class="font-medium">${s.member_name}</span> - <span class="text-gray-500">${s.role}</span></div>
+                        <p class="text-xs text-gray-400 mb-2">${s.event_date.split('-').reverse().join('/')}</p>
+                        <div class="flex gap-2 text-sm text-gray-200"><span class="font-medium text-white">${s.member_name}</span> - <span class="text-gray-400">${s.role}</span></div>
                     </div>`).join('');
                 lucide.createIcons();
             }
@@ -685,16 +806,16 @@
             const { data: notices } = await supabaseClient.from('notices').select('*').order('created_at', { ascending: false });
             if (notices) {
                 document.getElementById('notices-list').innerHTML = notices.map(n => `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="glass p-4 rounded-xl border border-gray-700">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-brand-dark">${n.title}</h4>
+                            <h4 class="font-bold text-neon">${n.title}</h4>
                             <div class="flex gap-2">
-                                <button onclick="editNotice('${n.id}', '${n.title}', '${n.content.replace(/'/g, "\\'")}')" class="text-blue-400"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                                <button onclick="deleteItem('notices', '${n.id}')" class="text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                <button onclick="editNotice('${n.id}', '${n.title}', '${n.content.replace(/'/g, "\\'")}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                <button onclick="deleteItem('notices', '${n.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-700 whitespace-pre-wrap">${n.content}</p>
-                        <p class="text-[10px] text-gray-400 mt-3 text-right">Enviado em ${new Date(n.created_at).toLocaleDateString('pt-BR')}</p>
+                        <p class="text-sm text-gray-300 whitespace-pre-wrap">${n.content}</p>
+                        <p class="text-[10px] text-gray-500 mt-3 text-right">Enviado em ${new Date(n.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>`).join('');
                 lucide.createIcons();
             }
@@ -712,6 +833,7 @@
 
         async function deleteItem(table, id) {
             if(confirm("Tem certeza que deseja excluir este item?")) {
+                await supabaseClient.from('members').select(); // dummy
                 await supabaseClient.from(table).delete().eq('id', id);
                 loadAllData(); 
             }
