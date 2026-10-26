@@ -427,13 +427,10 @@
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
-        // Função Blindada: Remove TODOS os tipos de espaços (inclusive invisíveis) e caracteres estranhos
+        // Função Brutal: Remove TUDO que não for letra, número, @, ponto, underline ou hífen.
         function sanitizeEmail(emailStr) {
             if (!emailStr) return '';
-            // \s remove espaços normais. 
-            // \u200B-\u200D remove "Zero Width Space" (espaços invisíveis).
-            // \uFEFF remove Byte Order Mark (BOM).
-            return emailStr.replace(/[\s\u200B-\u200D\uFEFF]/g, '').toLowerCase();
+            return emailStr.toLowerCase().replace(/[^a-z0-9@._-]/g, '');
         }
 
         function checkPermissions(userEmail) {
@@ -444,6 +441,11 @@
 
             const isAdmin = cleanAdminEmails.includes(cleanEmail);
             const isAgent = cleanAgentEmails.includes(cleanEmail);
+            
+            // Debug no console do navegador (F12) para ver o que está acontecendo
+            console.log("-> Email bruto do Supabase:", userEmail);
+            console.log("-> Email limpo pelo sistema:", cleanEmail);
+            console.log("-> Tamanho após limpeza:", cleanEmail.length);
             
             return { isAdmin, isAgent, cleanEmail };
         }
