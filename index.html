@@ -427,24 +427,22 @@
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
-        // NOVA FUNÇÃO BLINDADA: Usa Regex para achar o e-mail, ignorando qualquer caractere invisível extra
+        // A SOLUÇÃO DEFINITIVA: Usa Regex para extrair o formato exato do e-mail, ignorando QUALQUER caractere invisível
         function checkPermissions(userEmail) {
-            const cleanEmail = (userEmail || '').toLowerCase().trim();
+            const emailStr = userEmail || '';
             
-            const isAdmin = ADMIN_EMAILS.some(email => {
-                // Transforma o e-mail em uma expressão regular que ignora maiúsculas/minúsculas
-                const regex = new RegExp(email.replace('.', '\\.'), 'i');
-                return regex.test(cleanEmail);
-            });
+            // Expressão Regular para encontrar o formato padrão de e-mail
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+            const matches = emailStr.match(emailRegex);
             
-            const isAgent = AGENT_EMAILS.some(email => {
-                const regex = new RegExp(email.replace('.', '\\.'), 'i');
-                return regex.test(cleanEmail);
-            });
+            // Se achar o e-mail, usa ele. Se não achar, usa vazio.
+            const cleanEmail = matches ? matches[0].toLowerCase() : '';
+
+            const isAdmin = cleanEmail === 'galvacao18@gmail.com';
+            const isAgent = cleanEmail === 'agentedapascom2026@gmail.com';
             
-            console.log("-> Email bruto do Supabase:", userEmail);
-            console.log("-> É Admin?", isAdmin);
-            console.log("-> É Agente?", isAgent);
+            console.log("-> Bruto do Supabase:", userEmail);
+            console.log("-> Email EXTRAÍDO pela Regex:", cleanEmail);
             
             return { isAdmin, isAgent, cleanEmail };
         }
@@ -561,7 +559,7 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    msg.textContent = `Acesso Negado: O e-mail "${cleanEmail}" não tem permissão.`;
+                    msg.textContent = `Acesso Negado: O e-mail extraído foi "${cleanEmail}".`;
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
             }
