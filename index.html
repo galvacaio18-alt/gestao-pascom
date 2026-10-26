@@ -422,30 +422,29 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // =====================================================
-        // LISTAS DE ACESSO
+        // LISTAS DE ACESSO 
         // =====================================================
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
-        // Função Brutal: Remove TUDO que não for letra, número, @, ponto, underline ou hífen.
-        function sanitizeEmail(emailStr) {
-            if (!emailStr) return '';
-            return emailStr.toLowerCase().replace(/[^a-z0-9@._-]/g, '');
-        }
-
+        // NOVA FUNÇÃO BLINDADA: Usa Regex para achar o e-mail, ignorando qualquer caractere invisível extra
         function checkPermissions(userEmail) {
-            const cleanEmail = sanitizeEmail(userEmail);
+            const cleanEmail = (userEmail || '').toLowerCase().trim();
             
-            const cleanAdminEmails = ADMIN_EMAILS.map(e => sanitizeEmail(e));
-            const cleanAgentEmails = AGENT_EMAILS.map(e => sanitizeEmail(e));
-
-            const isAdmin = cleanAdminEmails.includes(cleanEmail);
-            const isAgent = cleanAgentEmails.includes(cleanEmail);
+            const isAdmin = ADMIN_EMAILS.some(email => {
+                // Transforma o e-mail em uma expressão regular que ignora maiúsculas/minúsculas
+                const regex = new RegExp(email.replace('.', '\\.'), 'i');
+                return regex.test(cleanEmail);
+            });
             
-            // Debug no console do navegador (F12) para ver o que está acontecendo
+            const isAgent = AGENT_EMAILS.some(email => {
+                const regex = new RegExp(email.replace('.', '\\.'), 'i');
+                return regex.test(cleanEmail);
+            });
+            
             console.log("-> Email bruto do Supabase:", userEmail);
-            console.log("-> Email limpo pelo sistema:", cleanEmail);
-            console.log("-> Tamanho após limpeza:", cleanEmail.length);
+            console.log("-> É Admin?", isAdmin);
+            console.log("-> É Agente?", isAgent);
             
             return { isAdmin, isAgent, cleanEmail };
         }
@@ -562,7 +561,7 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    msg.textContent = `Acesso Negado: O e-mail "${cleanEmail}" (Tamanho: ${cleanEmail.length}) não tem permissão.`;
+                    msg.textContent = `Acesso Negado: O e-mail "${cleanEmail}" não tem permissão.`;
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
             }
