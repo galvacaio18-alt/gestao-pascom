@@ -422,10 +422,18 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // =====================================================
-        // LISTAS DE ACESSO (O SEGREDO ESTÁ AQUI)
+        // LISTAS DE ACESSO BLINDADAS
         // =====================================================
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
+
+        // Função para verificar permissões limpando espaços invisíveis e maiúsculas
+        function checkPermissions(userEmail) {
+            const cleanEmail = (userEmail || '').trim().toLowerCase();
+            const isAdmin = ADMIN_EMAILS.some(e => e.trim().toLowerCase() === cleanEmail);
+            const isAgent = AGENT_EMAILS.some(e => e.trim().toLowerCase() === cleanEmail);
+            return { isAdmin, isAgent, cleanEmail };
+        }
 
         let globalCommunities = [];
         let globalMembers = [];
@@ -487,16 +495,12 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        // VERIFICAÇÃO DE SESSÃO (BLINDADA)
+        // VERIFICAÇÃO DE SESSÃO
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {
-                const userEmail = (session.user.email || '').trim().toLowerCase();
-                
-                // Usa .includes() para evitar erros de digitação
-                const isAdmin = ADMIN_EMAILS.includes(userEmail);
-                const isAgent = AGENT_EMAILS.includes(userEmail);
+                const { isAdmin, isAgent } = checkPermissions(session.user.email);
 
                 if (isAdmin) {
                     navigate('app');
@@ -515,7 +519,7 @@
             }
         }
 
-        // LOGIN (BLINDADO)
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
@@ -531,10 +535,7 @@
                 msg.textContent = "Acesso Negado: E-mail ou senha incorretos.";
                 msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
             } else {
-                const userEmail = (data.user.email || '').trim().toLowerCase();
-                
-                const isAdmin = ADMIN_EMAILS.includes(userEmail);
-                const isAgent = AGENT_EMAILS.includes(userEmail);
+                const { isAdmin, isAgent, cleanEmail } = checkPermissions(data.user.email);
 
                 if (isAdmin) {
                     navigate('app');
@@ -546,8 +547,8 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    // MOSTRA O TAMANHO DO E-MAIL PARA DEBUG (galvacao18@gmail.com tem 20 letras)
-                    msg.textContent = `Acesso Negado: O e-mail "${userEmail}" (Tamanho: ${userEmail.length}) não tem permissão.`;
+                    // MOSTRA O TAMANHO DO E-MAIL PARA DEBUG
+                    msg.textContent = `Acesso Negado: O e-mail "${cleanEmail}" (Tamanho: ${cleanEmail.length}) não tem permissão.`;
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
             }
