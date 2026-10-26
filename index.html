@@ -365,15 +365,26 @@
         </div>
     </div>
 
+    <!-- MODAL: ESCALA (COM HORÁRIO E OBSERVAÇÃO) -->
     <div id="modal-schedule" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold text-white mb-4" id="title-schedule">Nova Escala</h3>
             <form id="form-schedule" class="space-y-3">
                 <input type="hidden" id="s-id">
                 <input type="text" id="s-event" required placeholder="Evento" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
-                <input type="date" id="s-date" required class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-400 focus:ring-2 focus:ring-brand outline-none">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">Data</label>
+                        <input type="date" id="s-date" required class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-400 focus:ring-2 focus:ring-brand outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">Horário</label>
+                        <input type="time" id="s-time" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-400 focus:ring-2 focus:ring-brand outline-none">
+                    </div>
+                </div>
                 <input type="text" id="s-member" required placeholder="Nome do Agente" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                 <input type="text" id="s-role" required placeholder="Função" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <textarea id="s-observation" placeholder="Observações (Opcional)" rows="2" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></textarea>
                 <div class="flex gap-2 justify-end mt-4">
                     <button type="button" onclick="closeModal('modal-schedule')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
                     <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
@@ -382,13 +393,19 @@
         </div>
     </div>
 
+    <!-- MODAL: AVISO (COM HORÁRIO E OBSERVAÇÃO) -->
     <div id="modal-notice" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold text-white mb-4" id="title-notice">Novo Aviso</h3>
             <form id="form-notice" class="space-y-3">
                 <input type="hidden" id="n-id">
                 <input type="text" id="n-title" required placeholder="Título do Aviso" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
-                <textarea id="n-content" required placeholder="Escreva o recado..." rows="4" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></textarea>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Horário (Opcional)</label>
+                    <input type="time" id="n-time" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-400 focus:ring-2 focus:ring-brand outline-none">
+                </div>
+                <textarea id="n-content" required placeholder="Escreva o recado principal..." rows="3" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></textarea>
+                <textarea id="n-observation" placeholder="Observação adicional (Opcional)" rows="2" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none"></textarea>
                 <div class="flex gap-2 justify-end mt-4">
                     <button type="button" onclick="closeModal('modal-notice')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
                     <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
@@ -406,9 +423,6 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // =====================================================
-        // CONTROLE DE PERMISSÕES (BASEADO EM E-MAILS REAIS)
-        // =====================================================
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
@@ -434,7 +448,6 @@
             currentUserIsAdmin = isAdmin;
             
             if (isAdmin) {
-                // Se for admin, mostra tudo
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                 document.querySelectorAll('.admin-btn').forEach(el => {
                     el.style.display = 'flex'; 
@@ -442,7 +455,6 @@
                 });
                 switchTab('dashboard');
             } else {
-                // Se for agente, esconde abas restritas
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 document.querySelectorAll('.admin-btn').forEach(el => {
                     el.style.display = 'none'; 
@@ -474,9 +486,6 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        // =====================================================
-        // CONTROLE DE SESSÃO
-        // =====================================================
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             
@@ -494,7 +503,6 @@
                     applyPermissions(false);
                     loadAllData();
                 } else {
-                    // Se logar com um e-mail que não está em nenhuma lista, bloqueia
                     await supabaseClient.auth.signOut();
                     navigate('login');
                 }
@@ -503,7 +511,6 @@
             }
         }
 
-        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
@@ -532,7 +539,6 @@
                     applyPermissions(false);
                     loadAllData();
                 } else {
-                    // Bloqueia e-mail não autorizado
                     await supabaseClient.auth.signOut();
                     msg.textContent = "Acesso Negado: E-mail não autorizado.";
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700";
@@ -548,7 +554,6 @@
             navigate('login'); 
         }
 
-        // RECUPERAÇÃO DE SENHA
         document.getElementById('forgot-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('forgot-email').value.toLowerCase().trim();
@@ -557,7 +562,6 @@
 
             btn.innerHTML = 'Enviando...'; btn.disabled = true; msg.className = 'hidden';
 
-            // Como agora é uma conta real, pode enviar para qualquer um, o Supabase valida
             const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
                 redirectTo: SITE_URL,
             });
@@ -600,7 +604,6 @@
         });
 
         // --- FUNÇÕES DE DADOS (CRUD) ---
-        // (As funções abaixo são idênticas ao código anterior e estão funcionando perfeitamente)
         async function loadAllData() {
             await loadCommunities();
             await loadMembers();
@@ -972,9 +975,13 @@
                 document.getElementById('schedules-list').innerHTML = schedules.map(s => {
                     const actionButtons = currentUserIsAdmin ? `
                         <div class="flex gap-2">
-                            <button onclick="editSchedule('${s.id}', '${s.event_name}', '${s.event_date}', '${s.member_name}', '${s.role}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                            <button onclick="editSchedule('${s.id}', '${s.event_name}', '${s.event_date}', '${s.event_time || ''}', '${s.member_name}', '${s.role}', '${s.observation || ''}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
                             <button onclick="deleteItem('schedules', '${s.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>` : '';
+
+                    // Formatação do horário (se existir)
+                    const timeDisplay = s.event_time ? ` às ${s.event_time}` : '';
+                    const observationDisplay = s.observation ? `<p class="text-xs text-yellow-400 mt-2 bg-yellow-900/20 p-2 rounded border border-yellow-700/50"><i data-lucide="info" class="w-3 h-3 inline mr-1"></i> ${s.observation}</p>` : '';
 
                     return `
                     <div class="glass p-4 rounded-xl border border-gray-700">
@@ -982,19 +989,45 @@
                             <p class="font-bold text-neon text-sm">${s.event_name}</p>
                             ${actionButtons}
                         </div>
-                        <p class="text-xs text-gray-400 mb-2">${s.event_date.split('-').reverse().join('/')}</p>
+                        <p class="text-xs text-gray-400 mb-2">${s.event_date.split('-').reverse().join('/')}${timeDisplay}</p>
                         <div class="flex gap-2 text-sm text-gray-200"><span class="font-medium text-white">${s.member_name}</span> - <span class="text-gray-400">${s.role}</span></div>
+                        ${observationDisplay}
                     </div>`;
                 }).join('');
                 lucide.createIcons();
             }
         }
-        function openScheduleModal() { document.getElementById('form-schedule').reset(); document.getElementById('s-id').value = ''; document.getElementById('title-schedule').innerText = 'Nova Escala'; openModal('modal-schedule'); }
-        function editSchedule(id, event, date, member, role) { document.getElementById('s-id').value = id; document.getElementById('s-event').value = event; document.getElementById('s-date').value = date; document.getElementById('s-member').value = member; document.getElementById('s-role').value = role; document.getElementById('title-schedule').innerText = 'Editar Escala'; openModal('modal-schedule'); }
+        
+        function openScheduleModal() { 
+            document.getElementById('form-schedule').reset(); 
+            document.getElementById('s-id').value = ''; 
+            document.getElementById('title-schedule').innerText = 'Nova Escala'; 
+            openModal('modal-schedule'); 
+        }
+        
+        function editSchedule(id, event, date, time, member, role, observation) { 
+            document.getElementById('s-id').value = id; 
+            document.getElementById('s-event').value = event; 
+            document.getElementById('s-date').value = date; 
+            document.getElementById('s-time').value = time || ''; 
+            document.getElementById('s-member').value = member; 
+            document.getElementById('s-role').value = role; 
+            document.getElementById('s-observation').value = observation || ''; 
+            document.getElementById('title-schedule').innerText = 'Editar Escala'; 
+            openModal('modal-schedule'); 
+        }
+        
         document.getElementById('form-schedule').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('s-id').value;
-            const payload = { event_name: document.getElementById('s-event').value, event_date: document.getElementById('s-date').value, member_name: document.getElementById('s-member').value, role: document.getElementById('s-role').value };
+            const payload = { 
+                event_name: document.getElementById('s-event').value, 
+                event_date: document.getElementById('s-date').value, 
+                event_time: document.getElementById('s-time').value,
+                member_name: document.getElementById('s-member').value, 
+                role: document.getElementById('s-role').value,
+                observation: document.getElementById('s-observation').value
+            };
             if (id) await supabaseClient.from('schedules').update(payload).eq('id', id);
             else await supabaseClient.from('schedules').insert([payload]);
             closeModal('modal-schedule'); loadSchedules();
@@ -1006,29 +1039,55 @@
                 document.getElementById('notices-list').innerHTML = notices.map(n => {
                     const actionButtons = currentUserIsAdmin ? `
                         <div class="flex gap-2">
-                            <button onclick="editNotice('${n.id}', '${n.title}', '${n.content.replace(/'/g, "\\'")}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                            <button onclick="editNotice('${n.id}', '${n.title}', '${n.notice_time || ''}', '${n.content.replace(/'/g, "\\'")}', '${(n.observation || '').replace(/'/g, "\\'")}')" class="text-blue-400 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
                             <button onclick="deleteItem('notices', '${n.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>` : '';
+
+                    const timeDisplay = n.notice_time ? `<span class="text-xs text-neon font-bold ml-2"><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>${n.notice_time}</span>` : '';
+                    const observationDisplay = n.observation ? `<p class="text-sm text-yellow-300 mt-3 bg-yellow-900/20 p-2 rounded border border-yellow-700/50"><i data-lucide="info" class="w-4 h-4 inline mr-1"></i> ${n.observation}</p>` : '';
 
                     return `
                     <div class="glass p-4 rounded-xl border border-gray-700">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-neon">${n.title}</h4>
+                            <h4 class="font-bold text-neon flex items-center">${n.title} ${timeDisplay}</h4>
                             ${actionButtons}
                         </div>
                         <p class="text-sm text-gray-300 whitespace-pre-wrap">${n.content}</p>
+                        ${observationDisplay}
                         <p class="text-[10px] text-gray-500 mt-3 text-right">Enviado em ${new Date(n.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>`;
                 }).join('');
                 lucide.createIcons();
             }
         }
-        function openNoticeModal() { document.getElementById('form-notice').reset(); document.getElementById('n-id').value = ''; document.getElementById('title-notice').innerText = 'Novo Aviso'; openModal('modal-notice'); }
-        function editNotice(id, title, content) { document.getElementById('n-id').value = id; document.getElementById('n-title').value = title; document.getElementById('n-content').value = content; document.getElementById('title-notice').innerText = 'Editar Aviso'; openModal('modal-notice'); }
+        
+        function openNoticeModal() { 
+            document.getElementById('form-notice').reset(); 
+            document.getElementById('n-id').value = ''; 
+            document.getElementById('title-notice').innerText = 'Novo Aviso'; 
+            openModal('modal-notice'); 
+        }
+        
+        function editNotice(id, title, time, content, observation) { 
+            document.getElementById('n-id').value = id; 
+            document.getElementById('n-title').value = title; 
+            document.getElementById('n-time').value = time || ''; 
+            document.getElementById('n-content').value = content; 
+            document.getElementById('n-observation').value = observation || ''; 
+            document.getElementById('title-notice').innerText = 'Editar Aviso'; 
+            openModal('modal-notice'); 
+        }
+        
         document.getElementById('form-notice').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('n-id').value;
-            const payload = { title: document.getElementById('n-title').value, content: document.getElementById('n-content').value, author_name: 'Coordenação' };
+            const payload = { 
+                title: document.getElementById('n-title').value, 
+                notice_time: document.getElementById('n-time').value,
+                content: document.getElementById('n-content').value, 
+                observation: document.getElementById('n-observation').value,
+                author_name: 'Coordenação' 
+            };
             if (id) await supabaseClient.from('notices').update(payload).eq('id', id);
             else await supabaseClient.from('notices').insert([payload]);
             closeModal('modal-notice'); loadNotices();
