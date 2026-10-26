@@ -421,9 +421,10 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // E-mails de Admin (Acesso Total)
+        // =====================================================
+        // LISTAS DE ACESSO (O SEGREDO ESTÁ AQUI)
+        // =====================================================
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
-        // E-mails de Agente (Apenas Escalas e Avisos)
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
         let globalCommunities = [];
@@ -486,16 +487,16 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        // VERIFICAÇÃO DE SESSÃO
+        // VERIFICAÇÃO DE SESSÃO (BLINDADA)
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {
-                const userEmail = session.user.email ? session.user.email.trim().toLowerCase() : '';
+                const userEmail = (session.user.email || '').trim().toLowerCase();
                 
-                // Verifica se é admin ou agente de forma exata
-                const isAdmin = (userEmail === 'galvacao18@gmail.com');
-                const isAgent = (userEmail === 'agentedapascom2026@gmail.com');
+                // Usa .includes() para evitar erros de digitação
+                const isAdmin = ADMIN_EMAILS.includes(userEmail);
+                const isAgent = AGENT_EMAILS.includes(userEmail);
 
                 if (isAdmin) {
                     navigate('app');
@@ -514,7 +515,7 @@
             }
         }
 
-        // LOGIN
+        // LOGIN (BLINDADO)
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
@@ -530,10 +531,10 @@
                 msg.textContent = "Acesso Negado: E-mail ou senha incorretos.";
                 msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
             } else {
-                const userEmail = data.user.email ? data.user.email.trim().toLowerCase() : '';
+                const userEmail = (data.user.email || '').trim().toLowerCase();
                 
-                const isAdmin = (userEmail === 'galvacao18@gmail.com');
-                const isAgent = (userEmail === 'agentedapascom2026@gmail.com');
+                const isAdmin = ADMIN_EMAILS.includes(userEmail);
+                const isAgent = AGENT_EMAILS.includes(userEmail);
 
                 if (isAdmin) {
                     navigate('app');
@@ -545,7 +546,8 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    msg.textContent = `Acesso Negado: O e-mail "${userEmail}" não tem permissão.`;
+                    // MOSTRA O TAMANHO DO E-MAIL PARA DEBUG (galvacao18@gmail.com tem 20 letras)
+                    msg.textContent = `Acesso Negado: O e-mail "${userEmail}" (Tamanho: ${userEmail.length}) não tem permissão.`;
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
             }
@@ -609,7 +611,7 @@
             }
         });
 
-        // --- CRUD E CARREGAMENTO DE DADOS ---
+        // --- FUNÇÕES DE DADOS (CRUD) ---
         async function loadAllData() {
             await loadCommunities();
             await loadMembers();
