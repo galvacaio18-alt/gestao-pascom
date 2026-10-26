@@ -406,12 +406,11 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // LISTA DE E-MAILS DE ADMINISTRADORES (Acesso Total)
-        // A verificação agora ignora maiúsculas/minúsculas
+        // =====================================================
+        // CONTROLE DE PERMISSÕES (BASEADO EM E-MAILS REAIS)
+        // =====================================================
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
-        
-        const AGENT_EMAIL = 'agentedapascom2026@gmail.com';
-        const AGENT_PASSWORD = '123456';
+        const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
         let globalCommunities = [];
         let globalMembers = [];
@@ -443,7 +442,7 @@
                 });
                 switchTab('dashboard');
             } else {
-                // Se for agente, esconde tudo de admin
+                // Se for agente, esconde abas restritas
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 document.querySelectorAll('.admin-btn').forEach(el => {
                     el.style.display = 'none'; 
@@ -476,35 +475,35 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         // =====================================================
-        // CONTROLE DE SESSÃO E PERMISSÕES
+        // CONTROLE DE SESSÃO
         // =====================================================
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             
-            // 1. PRIMEIRO verifica se há uma sessão ativa no Supabase (Admin)
             if (session) {
-                localStorage.removeItem('isHardcodedAgent'); // Se for admin, limpa a flag de agente
-                
-                // Transforma o e-mail do banco em minúsculo para comparar
                 const userEmail = session.user.email.toLowerCase().trim();
                 const isAdmin = ADMIN_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
-                
-                navigate('app');
-                applyPermissions(isAdmin);
-                loadAllData(); 
-            } 
-            // 2. SE NÃO houver sessão no Supabase, verifica se é a conta chumbada do Agente
-            else if (localStorage.getItem('isHardcodedAgent') === 'true') {
-                navigate('app');
-                applyPermissions(false); // Agente não é admin
-                loadAllData(); 
-            } 
-            // 3. Se não for nenhum dos dois, vai para o login
-            else {
+                const isAgent = AGENT_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
+
+                if (isAdmin) {
+                    navigate('app');
+                    applyPermissions(true);
+                    loadAllData();
+                } else if (isAgent) {
+                    navigate('app');
+                    applyPermissions(false);
+                    loadAllData();
+                } else {
+                    // Se logar com um e-mail que não está em nenhuma lista, bloqueia
+                    await supabaseClient.auth.signOut();
+                    navigate('login');
+                }
+            } else {
                 navigate('login');
             }
         }
 
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
@@ -514,38 +513,36 @@
             const email = document.getElementById('email').value.toLowerCase().trim();
             const password = document.getElementById('password').value;
 
-            // Verifica primeiro se é a conta do agente
-            if (email === AGENT_EMAIL && password === AGENT_PASSWORD) {
-                localStorage.setItem('isHardcodedAgent', 'true');
-                navigate('app');
-                applyPermissions(false);
-                loadAllData();
-                btn.innerHTML = 'Acessar Sistema'; btn.disabled = false;
-                return;
-            }
-
-            // Se não for, tenta logar no Supabase
             let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             
             if (error) {
                 msg.textContent = "Acesso Negado: E-mail ou senha incorretos.";
                 msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700";
             } else {
-                localStorage.removeItem('isHardcodedAgent'); // Limpa flag de agente
-                
                 const userEmail = data.user.email.toLowerCase().trim();
                 const isAdmin = ADMIN_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
-                
-                navigate('app');
-                applyPermissions(isAdmin);
-                loadAllData();
+                const isAgent = AGENT_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
+
+                if (isAdmin) {
+                    navigate('app');
+                    applyPermissions(true);
+                    loadAllData();
+                } else if (isAgent) {
+                    navigate('app');
+                    applyPermissions(false);
+                    loadAllData();
+                } else {
+                    // Bloqueia e-mail não autorizado
+                    await supabaseClient.auth.signOut();
+                    msg.textContent = "Acesso Negado: E-mail não autorizado.";
+                    msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700";
+                }
             }
             
             btn.innerHTML = 'Acessar Sistema'; btn.disabled = false;
         });
 
         async function logout() { 
-            localStorage.removeItem('isHardcodedAgent');
             await supabaseClient.auth.signOut(); 
             window.location.hash = ''; 
             navigate('login'); 
@@ -560,13 +557,7 @@
 
             btn.innerHTML = 'Enviando...'; btn.disabled = true; msg.className = 'hidden';
 
-            if (email === AGENT_EMAIL) {
-                msg.textContent = "Esta conta de agente não possui recuperação por e-mail.";
-                msg.className = "text-sm text-center mt-4 text-yellow-400 bg-yellow-900/30 block p-2 rounded-lg border border-yellow-700";
-                btn.innerHTML = 'Enviar Link'; btn.disabled = false;
-                return;
-            }
-
+            // Como agora é uma conta real, pode enviar para qualquer um, o Supabase valida
             const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
                 redirectTo: SITE_URL,
             });
@@ -609,6 +600,7 @@
         });
 
         // --- FUNÇÕES DE DADOS (CRUD) ---
+        // (As funções abaixo são idênticas ao código anterior e estão funcionando perfeitamente)
         async function loadAllData() {
             await loadCommunities();
             await loadMembers();
