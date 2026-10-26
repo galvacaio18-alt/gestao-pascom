@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PasCom Paroquial Cristo Ressuscitado - Tech</title>
+    <title>PasCom Tech - Gestão Paroquial</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,83 +24,33 @@
             }
         }
     </script>
-    <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        body {
-            background-color: #0F172A;
-            color: #F8FAFC;
-            overflow-x: hidden;
-        }
-
-        /* FUNDO TECNOLÓGICO */
+        body { background-color: #0F172A; color: #F8FAFC; overflow-x: hidden; }
         .tech-grid {
-            position: fixed;
-            top: 0; left: 0; width: 200%; height: 200%;
-            background-image: 
-                linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            transform: perspective(500px) rotateX(20deg);
-            animation: moveGrid 10s linear infinite;
-            z-index: -2;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 200%; height: 200%;
+            background-image: linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px; transform: perspective(500px) rotateX(20deg);
+            animation: moveGrid 10s linear infinite; z-index: -2; pointer-events: none;
         }
-
-        @keyframes moveGrid {
-            0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
-            100% { transform: perspective(500px) rotateX(20deg) translateY(40px); }
-        }
-
-        /* LUZES DE FUNDO */
-        .glow-orb {
-            position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.4;
-            animation: floatOrb 10s infinite alternate; pointer-events: none;
-        }
+        @keyframes moveGrid { 0% { transform: perspective(500px) rotateX(20deg) translateY(0); } 100% { transform: perspective(500px) rotateX(20deg) translateY(40px); } }
+        .glow-orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.4; animation: floatOrb 10s infinite alternate; pointer-events: none; }
         .orb-purple { width: 400px; height: 400px; background: #8B5CF6; top: -100px; left: -100px; }
         .orb-blue { width: 300px; height: 300px; background: #3B82F6; bottom: -50px; right: -50px; animation-delay: -5s; }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(30px, 50px); }
-        }
-
-        /* ÍCONES FLUTUANTES */
-        .float-icon {
-            position: fixed; color: rgba(139, 92, 246, 0.15); z-index: -1;
-            animation: floatIcon 6s ease-in-out infinite; pointer-events: none;
-        }
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
-        }
-
-        /* EFEITO DE VIDRO */
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .glass-hover:hover {
-            border-color: rgba(139, 92, 246, 0.5);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
-        }
-
+        @keyframes floatOrb { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+        .float-icon { position: fixed; color: rgba(139, 92, 246, 0.15); z-index: -1; animation: floatIcon 6s ease-in-out infinite; pointer-events: none; }
+        @keyframes floatIcon { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(10deg); } }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+        .glass-hover:hover { border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); transform: translateY(-2px); transition: all 0.3s ease; }
         .screen { display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        
         .tab-content { animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .text-neon { text-shadow: 0 0 10px rgba(139, 92, 246, 0.7); }
         .border-neon { border-color: rgba(139, 92, 246, 0.5); box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.2); }
@@ -108,7 +58,6 @@
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <!-- FUNDO -->
     <div class="tech-grid"></div>
     <div class="glow-orb orb-purple"></div>
     <div class="glow-orb orb-blue"></div>
@@ -123,7 +72,7 @@
             <div class="glass p-8 rounded-2xl w-full max-w-md border-neon">
                 <div class="text-center mb-8">
                     <div class="inline-flex bg-brand text-white p-4 rounded-2xl mb-4 shadow-[0_0_20px_rgba(139,92,246,0.5)]"><i data-lucide="satellite-dish" class="w-8 h-8"></i></div>
-                    <h2 class="text-2xl font-tech font-bold text-white text-center tracking-wider">PASCOM <span class="text-neon">CRISTO</span></h2>
+                    <h2 class="text-2xl font-tech font-bold text-white text-center tracking-wider">PASCOM <span class="text-neon">TECH</span></h2>
                     <p class="text-gray-400 text-sm mt-1">Acesso restrito à coordenação</p>
                 </div>
                 <form id="login-form" class="space-y-4">
@@ -159,7 +108,6 @@
                     <div><h1 class="text-2xl font-bold text-white">Painel Estatístico</h1><p class="text-sm text-gray-400">Monitoramento em tempo real</p></div>
                 </div>
 
-                <!-- Card Especial Carlo Acutis -->
                 <div class="glass rounded-2xl p-5 mb-6 border-l-4 border-l-neon relative overflow-hidden">
                     <div class="absolute right-0 top-0 opacity-10"><i data-lucide="globe" class="w-32 h-32 text-white"></i></div>
                     <p class="text-sm text-gray-300 italic mb-2">"A Eucaristia é a minha autoestrada para o Céu."</p>
@@ -221,7 +169,7 @@
             <!-- ABA: FINANCEIRO -->
             <div id="tab-financeiro" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <div><h1 class="text-2xl font-bold text-white">Financeiro</h1><p class="text-sm text-gray-400">Fluxo de caixa</p></div>
+                    <div><h1 class="text-2xl font-bold text-white">Financeiro</h1><p class="text-sm text-gray-400">Fluxo de caixa e comprovantes</p></div>
                     <button onclick="openFinanceModal()" class="bg-brand text-white p-3 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:bg-brand-dark transition"><i data-lucide="plus" class="w-5 h-5"></i></button>
                 </div>
                 <div class="glass p-6 rounded-2xl mb-4 text-center">
@@ -270,7 +218,6 @@
 
         </main>
 
-        <!-- MENU INFERIOR -->
         <nav class="fixed bottom-0 left-0 right-0 glass border-t border-gray-700 flex justify-start md:justify-around overflow-x-auto no-scrollbar py-2 z-50">
             <button onclick="switchTab('dashboard')" class="nav-btn text-neon flex flex-col items-center gap-1 min-w-[70px] transition-all"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] font-bold">Painel</span></button>
             <button onclick="switchTab('membros')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 min-w-[70px] hover:text-white transition-all"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[10px]">Agentes</span></button>
@@ -326,8 +273,9 @@
         </div>
     </div>
 
+    <!-- MODAL FINANCEIRO COM UPLOAD DE COMPROVANTE -->
     <div id="modal-finance" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+        <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold text-white mb-4" id="title-finance">Nova Transação</h3>
             <form id="form-finance" class="space-y-3">
                 <input type="hidden" id="f-id">
@@ -335,11 +283,20 @@
                     <option value="Entrada">Entrada (Receita)</option>
                     <option value="Saida">Saída (Despesa)</option>
                 </select>
-                <input type="text" id="f-category" required placeholder="Categoria" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                <input type="text" id="f-category" required placeholder="Categoria (Ex: Dízimo, Material)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
                 <input type="number" step="0.01" id="f-amount" required placeholder="Valor (R$)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-brand outline-none">
+                
+                <!-- NOVO CAMPO: COMPROVANTE -->
+                <div class="bg-gray-800/80 border border-gray-600 rounded-lg p-3">
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase">Anexar Comprovante (Opcional)</label>
+                    <input type="file" id="f-receipt-file" accept="image/*,application/pdf" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand file:text-white hover:file:bg-brand-dark cursor-pointer">
+                    <input type="hidden" id="f-receipt-url">
+                    <p class="text-[10px] text-gray-500 mt-1">Aceita Imagens (JPG/PNG) ou PDF.</p>
+                </div>
+
                 <div class="flex gap-2 justify-end mt-4">
                     <button type="button" onclick="closeModal('modal-finance')" class="px-4 py-2 text-gray-400 hover:text-white">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
+                    <button type="submit" id="btn-save-finance" class="px-4 py-2 bg-brand text-white rounded-lg font-bold hover:bg-brand-dark">Salvar</button>
                 </div>
             </form>
         </div>
@@ -443,12 +400,12 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error && error.message.includes('Invalid login credentials')) {
-                let { error: signUpError } = await supabaseClient.auth.signUp({ email, password });
-                if (signUpError) { msg.textContent = "Erro: " + signUpError.message; msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg"; }
-                else { navigate('app'); return; }
-            } else if (error) { msg.textContent = "Erro: " + error.message; msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg"; } 
-            else { navigate('app'); }
+            if (error) {
+                msg.textContent = "Acesso Negado: E-mail ou senha incorretos.";
+                msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700";
+            } else {
+                navigate('app');
+            }
             btn.innerHTML = 'Acessar Sistema'; btn.disabled = false;
         });
 
@@ -591,7 +548,7 @@
             closeModal('modal-member'); loadAllData();
         });
 
-        // --- DASHBOARD E GRÁFICO ---
+        // --- DASHBOARD ---
         async function loadDashboard() {
             const ativos = globalMembers.filter(m => m.status === 'Ativo').length;
             document.getElementById('stat-total-members').innerText = ativos;
@@ -637,14 +594,10 @@
                     }] 
                 },
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
+                    responsive: true, maintainAspectRatio: false, 
                     animation: { duration: 2000, easing: 'easeOutQuart' },
                     plugins: { legend: { display: false } }, 
-                    scales: { 
-                        y: { display: false, beginAtZero: true }, 
-                        x: { grid: { display: false }, ticks: { color: '#9CA3AF' } } 
-                    } 
+                    scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#9CA3AF' } } } 
                 }
             });
         }
@@ -708,17 +661,28 @@
             lucide.createIcons();
         }
 
-        // --- FINANCEIRO ---
+        // --- FINANCEIRO (COM COMPROVANTES) ---
         async function loadFinances() {
             const { data: finances } = await supabaseClient.from('finances').select('*').order('transaction_date', { ascending: false });
             let income = 0, expense = 0;
+            
             if (finances) {
                 document.getElementById('finance-list').innerHTML = finances.map(f => {
                     if (f.type === 'Entrada') income += parseFloat(f.amount); else expense += parseFloat(f.amount);
+                    
+                    // Se existir comprovante, mostra o botão
+                    const receiptBtn = f.receipt_url 
+                        ? `<a href="${f.receipt_url}" target="_blank" class="text-gray-400 hover:text-neon p-1" title="Ver Comprovante"><i data-lucide="paperclip" class="w-4 h-4"></i></a>` 
+                        : '';
+
                     return `<div class="glass p-3 rounded-lg flex justify-between items-center mb-2 border border-gray-700">
-                        <div><p class="font-bold text-sm text-white">${f.category}</p><p class="text-xs ${f.type === 'Entrada' ? 'text-green-400' : 'text-red-400'}">${f.type === 'Entrada' ? '+' : '-'} R$ ${parseFloat(f.amount).toFixed(2)}</p></div>
-                        <div class="flex gap-1">
-                            <button onclick="editFinance('${f.id}', '${f.type}', '${f.category}', ${f.amount})" class="text-blue-400 p-1 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                        <div>
+                            <p class="font-bold text-sm text-white">${f.category}</p>
+                            <p class="text-xs ${f.type === 'Entrada' ? 'text-green-400' : 'text-red-400'}">${f.type === 'Entrada' ? '+' : '-'} R$ ${parseFloat(f.amount).toFixed(2)}</p>
+                        </div>
+                        <div class="flex gap-1 items-center">
+                            ${receiptBtn}
+                            <button onclick="editFinance('${f.id}', '${f.type}', '${f.category}', ${f.amount}, '${f.receipt_url || ''}')" class="text-blue-400 p-1 hover:text-blue-300"><i data-lucide="edit" class="w-4 h-4"></i></button>
                             <button onclick="deleteItem('finances', '${f.id}')" class="text-red-400 p-1 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>`;
@@ -729,14 +693,65 @@
             document.getElementById('finance-expense').innerText = `R$ ${expense.toFixed(2)}`;
             document.getElementById('finance-balance').innerText = `R$ ${(income - expense).toFixed(2)}`;
         }
-        function openFinanceModal() { document.getElementById('form-finance').reset(); document.getElementById('f-id').value = ''; document.getElementById('title-finance').innerText = 'Nova Transação'; openModal('modal-finance'); }
-        function editFinance(id, type, category, amount) { document.getElementById('f-id').value = id; document.getElementById('f-type').value = type; document.getElementById('f-category').value = category; document.getElementById('f-amount').value = amount; document.getElementById('title-finance').innerText = 'Editar Transação'; openModal('modal-finance'); }
+
+        function openFinanceModal() { 
+            document.getElementById('form-finance').reset(); 
+            document.getElementById('f-id').value = ''; 
+            document.getElementById('f-receipt-url').value = ''; 
+            document.getElementById('title-finance').innerText = 'Nova Transação'; 
+            openModal('modal-finance'); 
+        }
+        
+        function editFinance(id, type, category, amount, receiptUrl) { 
+            document.getElementById('f-id').value = id; 
+            document.getElementById('f-type').value = type; 
+            document.getElementById('f-category').value = category; 
+            document.getElementById('f-amount').value = amount; 
+            document.getElementById('f-receipt-url').value = receiptUrl || ''; 
+            document.getElementById('title-finance').innerText = 'Editar Transação'; 
+            openModal('modal-finance'); 
+        }
+
+        // Upload e salvamento do Financeiro
         document.getElementById('form-finance').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btn-save-finance');
+            btn.innerHTML = 'Salvando...'; btn.disabled = true;
+
             const id = document.getElementById('f-id').value;
-            const payload = { type: document.getElementById('f-type').value, category: document.getElementById('f-category').value, amount: document.getElementById('f-amount').value };
+            let receiptUrl = document.getElementById('f-receipt-url').value; // Pega a URL antiga se for edição
+            const fileInput = document.getElementById('f-receipt-file');
+
+            // Se o usuário anexou um arquivo novo
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `receipt-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const filePath = `receipts/${fileName}`; // Salva na pasta receipts dentro do bucket avatars
+
+                const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(filePath, file);
+
+                if (uploadError) {
+                    alert("Erro ao subir o comprovante: " + uploadError.message);
+                    btn.innerHTML = 'Salvar'; btn.disabled = false;
+                    return;
+                }
+
+                const { data: publicUrlData } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
+                receiptUrl = publicUrlData.publicUrl;
+            }
+
+            const payload = { 
+                type: document.getElementById('f-type').value, 
+                category: document.getElementById('f-category').value, 
+                amount: document.getElementById('f-amount').value,
+                receipt_url: receiptUrl
+            };
+
             if (id) await supabaseClient.from('finances').update(payload).eq('id', id);
             else await supabaseClient.from('finances').insert([payload]);
+            
+            btn.innerHTML = 'Salvar'; btn.disabled = false;
             closeModal('modal-finance'); loadFinances();
         });
 
@@ -833,7 +848,6 @@
 
         async function deleteItem(table, id) {
             if(confirm("Tem certeza que deseja excluir este item?")) {
-                await supabaseClient.from('members').select(); // dummy
                 await supabaseClient.from(table).delete().eq('id', id);
                 loadAllData(); 
             }
