@@ -92,7 +92,7 @@
                     </div>
                     <button type="submit" id="btn-submit" class="w-full bg-gradient-to-r from-brand to-blue-600 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] transition-all mt-4 flex justify-center items-center">Acessar Sistema</button>
                 </form>
-                <p id="auth-msg" class="text-sm text-center mt-4 hidden p-2 rounded-lg"></p>
+                <p id="auth-msg" class="text-sm text-center mt-4 hidden p-2 rounded-lg break-words"></p>
             </div>
         </div>
     </div>
@@ -365,7 +365,6 @@
         </div>
     </div>
 
-    <!-- MODAL: ESCALA (COM HORÁRIO E OBSERVAÇÃO) -->
     <div id="modal-schedule" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold text-white mb-4" id="title-schedule">Nova Escala</h3>
@@ -393,7 +392,6 @@
         </div>
     </div>
 
-    <!-- MODAL: AVISO (COM HORÁRIO E OBSERVAÇÃO) -->
     <div id="modal-notice" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="glass border border-gray-600 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold text-white mb-4" id="title-notice">Novo Aviso</h3>
@@ -423,7 +421,9 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // E-mails de Admin (Acesso Total)
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
+        // E-mails de Agente (Apenas Escalas e Avisos)
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
         let globalCommunities = [];
@@ -486,13 +486,16 @@
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
+        // VERIFICAÇÃO DE SESSÃO
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {
-                const userEmail = session.user.email.toLowerCase().trim();
-                const isAdmin = ADMIN_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
-                const isAgent = AGENT_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
+                const userEmail = session.user.email ? session.user.email.trim().toLowerCase() : '';
+                
+                // Verifica se é admin ou agente de forma exata
+                const isAdmin = (userEmail === 'galvacao18@gmail.com');
+                const isAgent = (userEmail === 'agentedapascom2026@gmail.com');
 
                 if (isAdmin) {
                     navigate('app');
@@ -511,24 +514,26 @@
             }
         }
 
+        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-submit');
             const msg = document.getElementById('auth-msg');
             btn.innerHTML = 'Autenticando...'; btn.disabled = true; msg.className = 'hidden';
             
-            const email = document.getElementById('email').value.toLowerCase().trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
 
             let { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             
             if (error) {
                 msg.textContent = "Acesso Negado: E-mail ou senha incorretos.";
-                msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700";
+                msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
             } else {
-                const userEmail = data.user.email.toLowerCase().trim();
-                const isAdmin = ADMIN_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
-                const isAgent = AGENT_EMAILS.map(e => e.toLowerCase().trim()).includes(userEmail);
+                const userEmail = data.user.email ? data.user.email.trim().toLowerCase() : '';
+                
+                const isAdmin = (userEmail === 'galvacao18@gmail.com');
+                const isAgent = (userEmail === 'agentedapascom2026@gmail.com');
 
                 if (isAdmin) {
                     navigate('app');
@@ -540,8 +545,8 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    msg.textContent = "Acesso Negado: E-mail não autorizado.";
-                    msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700";
+                    msg.textContent = `Acesso Negado: O e-mail "${userEmail}" não tem permissão.`;
+                    msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
             }
             
@@ -554,6 +559,7 @@
             navigate('login'); 
         }
 
+        // RECUPERAÇÃO DE SENHA
         document.getElementById('forgot-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('forgot-email').value.toLowerCase().trim();
@@ -603,7 +609,7 @@
             }
         });
 
-        // --- FUNÇÕES DE DADOS (CRUD) ---
+        // --- CRUD E CARREGAMENTO DE DADOS ---
         async function loadAllData() {
             await loadCommunities();
             await loadMembers();
@@ -979,7 +985,6 @@
                             <button onclick="deleteItem('schedules', '${s.id}')" class="text-red-400 hover:text-red-300"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>` : '';
 
-                    // Formatação do horário (se existir)
                     const timeDisplay = s.event_time ? ` às ${s.event_time}` : '';
                     const observationDisplay = s.observation ? `<p class="text-xs text-yellow-400 mt-2 bg-yellow-900/20 p-2 rounded border border-yellow-700/50"><i data-lucide="info" class="w-3 h-3 inline mr-1"></i> ${s.observation}</p>` : '';
 
