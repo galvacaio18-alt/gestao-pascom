@@ -422,27 +422,25 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // =====================================================
-        // LISTAS DE ACESSO 
+        // VERIFICAÇÃO POR ID (À PROVA DE CARACTERES INVISÍVEIS)
         // =====================================================
-        const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
-        const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
+        // IDs extraídos diretamente do seu painel do Supabase
+        const ADMIN_IDS = ['a9e850ce-d07a-49a4-8f14-3be830d82439']; // galvacao18@gmail.com
+        const AGENT_IDS = ['acc21199-9711-42ea-ba5e-1aa5c15ce9a1']; // agentedapascom2026@gmail.com
 
-        // A SOLUÇÃO DEFINITIVA: Usa Regex para extrair o formato exato do e-mail, ignorando QUALQUER caractere invisível
-        function checkPermissions(userEmail) {
-            const emailStr = userEmail || '';
+        function checkPermissions(user) {
+            if (!user) return { isAdmin: false, isAgent: false, cleanEmail: '' };
             
-            // Expressão Regular para encontrar o formato padrão de e-mail
-            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-            const matches = emailStr.match(emailRegex);
-            
-            // Se achar o e-mail, usa ele. Se não achar, usa vazio.
-            const cleanEmail = matches ? matches[0].toLowerCase() : '';
+            const userId = user.id;
+            const cleanEmail = (user.email || '').toLowerCase().trim();
 
-            const isAdmin = cleanEmail === 'galvacao18@gmail.com';
-            const isAgent = cleanEmail === 'agentedapascom2026@gmail.com';
+            // Compara usando o ID único do usuário, ignorando o e-mail por completo
+            const isAdmin = ADMIN_IDS.includes(userId);
+            const isAgent = AGENT_IDS.includes(userId);
             
-            console.log("-> Bruto do Supabase:", userEmail);
-            console.log("-> Email EXTRAÍDO pela Regex:", cleanEmail);
+            console.log("-> User ID:", userId);
+            console.log("-> É Admin?", isAdmin);
+            console.log("-> É Agente?", isAgent);
             
             return { isAdmin, isAgent, cleanEmail };
         }
@@ -512,7 +510,7 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {
-                const { isAdmin, isAgent } = checkPermissions(session.user.email);
+                const { isAdmin, isAgent } = checkPermissions(session.user);
 
                 if (isAdmin) {
                     navigate('app');
@@ -547,7 +545,7 @@
                 msg.textContent = "Acesso Negado: E-mail ou senha incorretos.";
                 msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
             } else {
-                const { isAdmin, isAgent, cleanEmail } = checkPermissions(data.user.email);
+                const { isAdmin, isAgent, cleanEmail } = checkPermissions(data.user);
 
                 if (isAdmin) {
                     navigate('app');
@@ -559,7 +557,7 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    msg.textContent = `Acesso Negado: O e-mail extraído foi "${cleanEmail}".`;
+                    msg.textContent = `Acesso Negado: O ID "${data.user.id}" não tem permissão.`;
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
             }
