@@ -422,16 +422,29 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // =====================================================
-        // LISTAS DE ACESSO BLINDADAS
+        // LISTAS DE ACESSO
         // =====================================================
         const ADMIN_EMAILS = ['galvacao18@gmail.com']; 
         const AGENT_EMAILS = ['agentedapascom2026@gmail.com']; 
 
-        // Função para verificar permissões limpando espaços invisíveis e maiúsculas
+        // Função Blindada: Remove TODOS os tipos de espaços (inclusive invisíveis) e caracteres estranhos
+        function sanitizeEmail(emailStr) {
+            if (!emailStr) return '';
+            // \s remove espaços normais. 
+            // \u200B-\u200D remove "Zero Width Space" (espaços invisíveis).
+            // \uFEFF remove Byte Order Mark (BOM).
+            return emailStr.replace(/[\s\u200B-\u200D\uFEFF]/g, '').toLowerCase();
+        }
+
         function checkPermissions(userEmail) {
-            const cleanEmail = (userEmail || '').trim().toLowerCase();
-            const isAdmin = ADMIN_EMAILS.some(e => e.trim().toLowerCase() === cleanEmail);
-            const isAgent = AGENT_EMAILS.some(e => e.trim().toLowerCase() === cleanEmail);
+            const cleanEmail = sanitizeEmail(userEmail);
+            
+            const cleanAdminEmails = ADMIN_EMAILS.map(e => sanitizeEmail(e));
+            const cleanAgentEmails = AGENT_EMAILS.map(e => sanitizeEmail(e));
+
+            const isAdmin = cleanAdminEmails.includes(cleanEmail);
+            const isAgent = cleanAgentEmails.includes(cleanEmail);
+            
             return { isAdmin, isAgent, cleanEmail };
         }
 
@@ -547,7 +560,6 @@
                     loadAllData();
                 } else {
                     await supabaseClient.auth.signOut();
-                    // MOSTRA O TAMANHO DO E-MAIL PARA DEBUG
                     msg.textContent = `Acesso Negado: O e-mail "${cleanEmail}" (Tamanho: ${cleanEmail.length}) não tem permissão.`;
                     msg.className = "text-sm text-center mt-4 text-red-400 bg-red-900/30 block p-2 rounded-lg border border-red-700 break-words";
                 }
